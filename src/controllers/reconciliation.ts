@@ -1,7 +1,8 @@
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
-import setStatus from '@utils/setStatus'
 import { Reconciliation, Request, Purchase } from '@models/index'
+import setRequestStatus from '@utils/status/setRequestStatus'
+import setPurchaseStatus from '@utils/status/setPurchaseStatus'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -56,8 +57,8 @@ export const updateReconciliation = asyncHandler(async (req: Req<{ uuid: string 
       return next (new ErrorResponse(`Unable to update request status by requestId ${ purchase.requestId }`, 500))
     }
 
-    await setStatus(request.uuid, Request) // Update request status
-  } else await setStatus(purchase.uuid, Purchase) // Update purchase status
+    await setRequestStatus(request.uuid, next) // Update request status
+  } else await setPurchaseStatus(purchase.uuid, next) // Update purchase status
 
   res.status(200).json({
     success: true,

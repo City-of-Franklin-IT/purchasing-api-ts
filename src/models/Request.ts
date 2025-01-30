@@ -62,6 +62,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     },
     status: {
       type: DataTypes.ENUM(...Object.values(StatusEnum)),
+      defaultValue: StatusEnum.Pending
     },
     order: {
       type: DataTypes.VIRTUAL,

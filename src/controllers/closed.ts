@@ -1,7 +1,8 @@
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Closed, Purchase, Request } from '@models/index'
-import setStatus from '@utils/setStatus'
+import setPurchaseStatus from '@utils/status/setPurchaseStatus'
+import setRequestStatus from '@utils/status/setRequestStatus'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -41,8 +42,8 @@ export const createClosed = asyncHandler(async (req: Req<{}, {}, CreateClosedReq
       }
     }) as Model<RequestInterface> & RequestInterface
 
-    await setStatus(request?.uuid, Request) // Update request status
-  } else await setStatus(purchase.uuid, Purchase) // Update purchase status
+    await setRequestStatus(request.uuid, next) // Update request status
+  } else await setPurchaseStatus(purchase.uuid, next) // Update purchase status
 
   res.status(201).json({
     success: true,
@@ -116,11 +117,11 @@ export const deleteClosed = asyncHandler(async (req: Req<{ uuid: string }>, res:
       }
     }) as Model<RequestInterface> & RequestInterface
 
-    await setStatus(request.uuid, Request) // Update request status
-  } else await setStatus(purchase.uuid, Purchase) // Update purchase status
+    await setRequestStatus(request.uuid, next) // Update request status
+  } else await setPurchaseStatus(purchase.uuid, next) // Update purchase status
 
   res.status(200).json({
     success: true,
-    msg: "Deleted"
+    msg: "Closed Entry Deleted"
   })
 })

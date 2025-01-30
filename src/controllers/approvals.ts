@@ -1,6 +1,6 @@
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
-import setStatus from '@utils/setStatus'
+import setRequestStatus from '@utils/status/setRequestStatus'
 import { Approval, Request } from '@models/index'
 import { sendStatusEmail, sendPendingApprovalEmail } from '@utils/emails/automatedEmails'
 
@@ -46,13 +46,17 @@ export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {},
     }
   }) as Model<RequestInterface> & RequestInterface
 
-  const result = await setStatus(request.uuid, Request) // Update request status
+  const updatedRequest = await setRequestStatus(request.uuid, next) // Update request status
 
-  if(result.status === 'Pending Secondary Approval' && secondaryApprovalEmail) {
-    sendPendingApprovalEmail([secondaryApprovalEmail], result)
+  if(!updatedRequest) {
+    return next (new ErrorResponse(`Unable to update request status by request uuid ${ request.uuid }`, 500))
   }
 
-  sendStatusEmail(result)
+  if(updatedRequest.status === 'Pending Secondary Approval' && secondaryApprovalEmail) {
+    sendPendingApprovalEmail([secondaryApprovalEmail], updatedRequest)
+  }
+
+  sendStatusEmail(updatedRequest)
 
   res.status(200).json({
     success: true,

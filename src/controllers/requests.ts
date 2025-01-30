@@ -2,8 +2,8 @@ import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Request, Approval, Purchase, Attachment, Reconciliation, OPIQ, Coding, Closed, Delegate } from '@models/index'
 import getFiscalYear from '@utils/getFiscalYear'
-import setStatus from '@utils/setStatus'
 import { bindServiceAcct } from '@utils/ldap'
+import setRequestStatus from '@utils/status/setRequestStatus'
 import { adminSearch, parksLookup } from '@utils/ldap/ldapLookups'
 import { sendPendingApprovalEmail } from '@utils/emails/automatedEmails'
 
@@ -180,7 +180,7 @@ export const updateRequest = asyncHandler(async (req: Req<{ uuid: string }>, res
     return next(new ErrorResponse(`Unable to update request by uuid ${ req.params.uuid }`, 500))
   }
 
-  setStatus(req.params.uuid, Request)
+  setRequestStatus(req.params.uuid, next)
 
   res.status(200).json({
     success: true,

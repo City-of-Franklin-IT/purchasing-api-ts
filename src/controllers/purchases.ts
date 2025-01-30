@@ -1,8 +1,8 @@
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
-import { Purchase, Request, Reconciliation, Attachment, Approval, OPIQ, Coding, Closed } from '@models/index'
+import { Purchase, Request, Reconciliation, Attachment, OPIQ, Coding, Closed } from '@models/index'
 import getFiscalYear from '@utils/getFiscalYear'
-import setStatus from '@utils/setStatus'
+import setPurchaseStatus from '@utils/status/setPurchaseStatus'
 import { bindServiceAcct } from '@utils/ldap'
 import { adminSearch, parksLookup } from '@utils/ldap/ldapLookups'
 import { sendPurchaseEmail } from '@utils/emails/automatedEmails'
@@ -13,6 +13,8 @@ import { Model } from 'sequelize'
 import { Client } from 'ldapjs'
 import { DepartmentEnum, PurchaseInterface, RequestInterface, StatusEnum } from '@models/types'
 import { GetPurchasesResponse, GetPurchaseResponse, CreatePurchaseRequest, CreatePurchaseResponse, UpdatePurchaseRequest, UpdatePurchaseResponse, ControllerResponse } from './types'
+import setRequestStatus from '@utils/status/setRequestStatus'
+import { updateRequest } from './requests'
 
 //@desc    Get purchases
 //@route   GET /api/v2/dept-purchasing/purchases?department=
@@ -97,7 +99,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     return next(new ErrorResponse('Unable to create new purchase', 500))
   }
 
-  let emailBody = purchase
+  let emailBody
 
   if(requestId) { // If purchase has associated request - update status of request
     const request = await Request.findOne({
@@ -110,10 +112,14 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
       return next(new ErrorResponse(`Unable to update status for requestId ${ requestId }`, 500))
     }
 
-    const update = await setStatus(request.uuid, Request)
+    const updatedRequest = await setRequestStatus(request.uuid, next)
 
-    emailBody = update
-  }
+    if(!updatedRequest) {
+      return next(new ErrorResponse(`Unable to update request status by request uuid ${ request.uuid }`, 500))
+    }
+
+    emailBody = updatedRequest
+  } else emailBody = purchase
 
   if(process.env.NODE_ENV === 'production') { // Automated emails
     const client = await bindServiceAcct() as Client
@@ -123,7 +129,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
       const admins = await adminSearch(department, client) as string[]
 
       if(admins) {
-        sendPurchaseEmail(admins, emailBody)
+        sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
       }
     }
   
@@ -131,7 +137,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
       const emails = await parksLookup(email as string, client)
 
       if(emails) {
-        sendPurchaseEmail(emails, emailBody)
+        sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
       }
     }
   }
@@ -194,8 +200,8 @@ export const updatePurchase = asyncHandler(async (req: Req<{ uuid: string }, {},
       return next(new ErrorResponse(`Unable to update status for requestId ${ data.requestId }`, 500))
     }
 
-    await setStatus(request.uuid, Request)
-  } else setStatus(req.params.uuid, Purchase) // Update purchase status
+    await setRequestStatus(request.uuid, next)
+  } else setPurchaseStatus(data.uuid, next) // Update purchase status
 
   res.status(200).json({
     success: true,
@@ -235,7 +241,7 @@ export const deletePurchase = asyncHandler(async (req: Req<{ uuid: string }>, re
       return next(new ErrorResponse(`Unable to update status for requestId ${ purchase.requestId }`, 500))
     }
 
-    await setStatus(request.uuid, Request)
+    await setRequestStatus(request.uuid, next)
   }
 
   res.status(200).json({

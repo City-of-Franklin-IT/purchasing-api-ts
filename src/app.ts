@@ -21,6 +21,9 @@ app.use(cors({ origin: ['https://dev.franklintn.gov', 'https://apps.franklintn.g
 import routes from './routes'
 
 routes(app) // Mount routes
+app.use('/api/v2/dept-purchasing/api-docs', (req, res, next) => {
+  res.redirect('https://documenter.getpostman.com/view/6104227/2sAYdhHV3F')
+})
 
 app.use(errorHandler)
 

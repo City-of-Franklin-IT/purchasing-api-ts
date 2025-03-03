@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/middleware/csp/index.ts"],"names":[],"mappings":";;;;;AAAA,oDAA2B;AAE3B,kBAAe,gBAAM,CAAC,qBAAqB,CAAC;IAC1C,UAAU,EAAE;QACV,UAAU,EAAE,CAAC,QAAQ,CAAC;QACtB,SAAS,EAAE,CAAC,QAAQ,EAAE,qBAAqB,CAAC;QAC5C,SAAS,EAAE,CAAC,QAAQ,CAAC;QACrB,uBAAuB,EAAE,EAAE;KAC5B;CACF,CAAC,CAAA"}

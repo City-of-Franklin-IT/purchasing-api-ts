@@ -7,14 +7,13 @@ export default async (options: { email: string[] | string | undefined, subject: 
   const recipients = Array.isArray(options.email) ? options.email.join('; ') : options.email
 
   const transporter = createTransport({
-    service: 'smtp',
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
     auth: {
       user: process.env.SMTP_EMAIL,
       pass: process.env.SMTP_PASSWORD
     },
-    secure: true,
+    secureConnection: 'false',
     tls: {
       ciphers: 'SSLv3',
       rejectUnauthorized: false

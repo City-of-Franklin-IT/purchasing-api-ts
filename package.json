@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon -r tsconfig-paths/register src/app.ts",
-    "start": "node app --port 5000"
+    "start": "npx tsx dist/app.js --port 6000"
   },
   "author": "Andrew Southern",
   "license": "ISC",

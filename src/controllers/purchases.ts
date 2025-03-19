@@ -120,25 +120,29 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     emailBody = updatedRequest
   } else emailBody = purchase
 
-  if(process.env.NODE_ENV === 'production') { // Automated emails
-    const client = await bindServiceAcct() as Client
-
-    if(department === 'FIRE') { // Fire
-
-      const admins = await adminSearch(department, client) as string[]
-
-      if(admins) {
-        sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-      }
-    }
+  try {
+    if(process.env.NODE_ENV === 'production') { // Automated emails
+      const client = await bindServiceAcct() as Client
   
-    if(department === 'PARKS') { // Parks
-      const emails = await parksLookup(email as string, client)
-
-      if(emails) {
-        sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
+      if(department === 'FIRE') { // Fire
+  
+        const admins = await adminSearch(department, client) as string[]
+  
+        if(admins) {
+          sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
+        }
+      }
+    
+      if(department === 'PARKS') { // Parks
+        const emails = await parksLookup(email as string, client)
+  
+        if(emails) {
+          sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
+        }
       }
     }
+  } catch(err) {
+    console.log(err)
   }
 
   const reconciliation = await Reconciliation.create({ // Create reconciliation entry

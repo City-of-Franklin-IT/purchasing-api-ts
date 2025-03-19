@@ -14,7 +14,6 @@ import { Client } from 'ldapjs'
 import { DepartmentEnum, PurchaseInterface, RequestInterface, StatusEnum } from '@models/types'
 import { GetPurchasesResponse, GetPurchaseResponse, CreatePurchaseRequest, CreatePurchaseResponse, UpdatePurchaseRequest, UpdatePurchaseResponse, ControllerResponse } from './types'
 import setRequestStatus from '@utils/status/setRequestStatus'
-import { updateRequest } from './requests'
 
 //@desc    Get purchases
 //@route   GET /api/v2/dept-purchasing/purchases?department=

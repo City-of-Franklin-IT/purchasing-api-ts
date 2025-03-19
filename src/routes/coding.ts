@@ -1,10 +1,10 @@
 import { Router } from "express"
 import { createCode, updateCode, deleteCode } from "@controllers/coding"
-import { protect } from "@middleware/auth"
+import { protect, entra } from "@middleware/auth"
 
 const router = Router()
 
-router.use(protect)
+router.use(entra)
 
 router
   .route('/')

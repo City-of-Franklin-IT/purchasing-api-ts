@@ -1,10 +1,10 @@
 import { Router } from "express"
 import { getPurchases, getPurchase, createPurchase, updatePurchase, deletePurchase } from "@controllers/purchases"
-import { protect } from "@middleware/auth"
+import { protect, entra } from "@middleware/auth"
 
 const router = Router()
 
-router.use(protect)
+router.use(entra)
 
 router
   .route('/')

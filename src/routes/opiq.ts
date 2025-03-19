@@ -1,10 +1,10 @@
 import { Router } from "express"
 import { createOPIQ, updateOPIQ, deleteOPIQ } from "@controllers/opiq"
-import { protect } from "@middleware/auth"
+import { protect, entra } from "@middleware/auth"
 
 const router = Router()
 
-router.use(protect)
+router.use(entra)
 
 router
   .post('/', createOPIQ)

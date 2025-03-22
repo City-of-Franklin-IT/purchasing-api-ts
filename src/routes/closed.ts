@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { createClosed, updateClosed, deleteClosed } from "@controllers/closed"
-import { protect, entra } from "@middleware/auth"
+import { entra } from "@middleware/auth"
 
 const router = Router()
 

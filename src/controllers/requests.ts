@@ -95,7 +95,7 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
 export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestRequest>, res: Response<CreateRequestResponse>, next: NextFunction) => {
   const { department, requestLocation, requestDetails, vendor, requestAmount, weblink } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const request = await Request.create({
     requestId: `REQ${ getFiscalYear() }${ req.user?.department }-${ Math.floor(Date.now() / 1000) }`,
@@ -158,7 +158,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
 export const updateRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: Response<ControllerResponse>, next: NextFunction) => {
   const { requestLocation, requestDetails, vendor, requestAmount, weblink,  updatedAt } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const request = await Request.update({
     requestLocation,

@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { updateReconciliation } from "@controllers/reconciliation"
-import { protect, entra } from "@middleware/auth"
+import { entra } from "@middleware/auth"
 
 const router = Router()
 

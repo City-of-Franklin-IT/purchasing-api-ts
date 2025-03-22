@@ -16,7 +16,7 @@ import { UpdateReconciliationRequest, UpdateReconciliationResponse } from './typ
 export const updateReconciliation = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateReconciliationRequest>, res: Response<UpdateReconciliationResponse>, next: NextFunction) => {
   const { reconciled } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const reconciliation = await Reconciliation.update({
     reconciled,

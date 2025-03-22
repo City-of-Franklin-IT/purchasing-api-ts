@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { getRequests, getRequest, createRequest, updateRequest, deleteRequest } from "@controllers/requests"
-import { protect, entra } from "@middleware/auth"
+import { entra } from "@middleware/auth"
 
 const router = Router()
 

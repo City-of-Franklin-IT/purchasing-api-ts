@@ -16,7 +16,7 @@ import { ControllerResponse, CreateClosedRequest, UpdateClosedRequest } from './
 export const createClosed = asyncHandler(async (req: Req<{}, {}, CreateClosedRequest>, res: Response<ControllerResponse>, next: NextFunction) => {
   const { parentId, comments } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const result = await Closed.create({
     parentId,
@@ -57,7 +57,7 @@ export const createClosed = asyncHandler(async (req: Req<{}, {}, CreateClosedReq
 export const updateClosed = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateClosedRequest>, res: Response<ControllerResponse>, next: NextFunction) => {
   const { comments } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const result = await Closed.update({
     comments,

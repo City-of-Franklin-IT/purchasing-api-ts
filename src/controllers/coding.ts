@@ -14,7 +14,7 @@ import { ControllerResponse, CreateCodingRequest, CreateCodingResponse, UpdateCo
 export const createCode = asyncHandler(async (req: Req<{}, {}, CreateCodingRequest>, res: Response<CreateCodingResponse>, next: NextFunction) => {
   const { parentId, code } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const result = await Coding.create({
     parentId,
@@ -40,7 +40,7 @@ export const createCode = asyncHandler(async (req: Req<{}, {}, CreateCodingReque
 export const updateCode = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateCodingRequest>, res: Response<UpdateCodingResponse>, next: NextFunction) => {
   const { code } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const result = await Coding.update({
     code,

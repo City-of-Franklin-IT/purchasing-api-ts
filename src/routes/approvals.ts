@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { updateApproval } from '@controllers/approvals'
-import { protect, entra } from '@middleware/auth'
+import { entra } from '@middleware/auth'
 
 const router = Router()
 

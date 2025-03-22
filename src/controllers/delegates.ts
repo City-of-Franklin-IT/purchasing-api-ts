@@ -15,7 +15,7 @@ import { ControllerResponse, CreateDelegateRequest, CreateDelegateResponse, Upda
 export const createDelegate = asyncHandler(async (req: Req<{}, {}, CreateDelegateRequest>, res: Response<CreateDelegateResponse>, next: NextFunction) => {
   const { requestId } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const delegate = await Delegate.create({
     requestId,
@@ -39,7 +39,7 @@ export const createDelegate = asyncHandler(async (req: Req<{}, {}, CreateDelegat
 export const updateDelegate = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateDelegateRequest>, res: Response<UpdateDelegateResponse>, next: NextFunction) => {
   const { delegateEmail } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const delegate = await Delegate.update({
     delegateEmail,

@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { createDelegate, updateDelegate, deleteDelegate } from "@controllers/delegates"
-import { protect, entra } from "@middleware/auth"
+import { entra } from "@middleware/auth"
 
 const router = Router()
 

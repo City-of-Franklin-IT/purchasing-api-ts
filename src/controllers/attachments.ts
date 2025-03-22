@@ -36,29 +36,25 @@ export const getAttachment = asyncHandler(async (req: Req<{ uuid: string }>, res
 //@route   POST /api/v2/dept-purchasing/attachments
 //@access  Private
 export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttachmentRequest>, res: Response<ControllerResponse>, next: NextFunction) => {
-  try {
-    const { file } = req
-    const { parentId } = req.body
-  
-    const email = req.user?.email
-  
-    const fileType = determineFileType(file?.buffer)
-  
-    if(!fileType) {
-      return next(new ErrorResponse("Unable to upload file - wrong file type", 500))
-    }
-  
-    if(fileType.type === 'image') { 
-      processImage(file as unknown as FileInterface, parentId, email, next) // Image
-    } else processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
-  
-    res.status(201).json({
-      success: true,
-      msg: 'File uploaded'
-    })
-  } catch(err) {
-    console.log(err)
+  const { file } = req
+  const { parentId } = req.body
+
+  const email = req.entra?.preferred_username
+
+  const fileType = determineFileType(file?.buffer)
+
+  if(!fileType) {
+    return next(new ErrorResponse("Unable to upload file - wrong file type", 500))
   }
+
+  if(fileType.type === 'image') { 
+    processImage(file as unknown as FileInterface, parentId, email, next) // Image
+  } else processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
+
+  res.status(201).json({
+    success: true,
+    msg: 'File uploaded'
+  })
 })
 
 //@desc    Delete attachment

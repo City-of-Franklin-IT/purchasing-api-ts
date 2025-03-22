@@ -16,7 +16,7 @@ import { ApprovalInterface, RequestInterface } from '@models/types'
 export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateApprovalRequest>, res: Response<UpdateApprovalResponse>, next: NextFunction) => {
   const { primaryApproval, primaryApprovalEmail, secondaryApproval, secondaryApprovalEmail, requiresAP } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const approval = await Approval.update({
     primaryApproval,

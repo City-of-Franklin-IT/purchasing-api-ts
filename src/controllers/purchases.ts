@@ -78,7 +78,7 @@ export const getPurchase = asyncHandler(async (req: Req<{ uuid: string }>, res: 
 export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchaseRequest>, res: Response<CreatePurchaseResponse>, next: NextFunction) => {
   const { requestId, department, purchaseLocation, purchaseDetails, vendor, purchaseAmount, lastFour } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const purchase = await Purchase.create({
     purchaseId: !requestId ? `PUR${ getFiscalYear() }${ department }-${ Math.floor(Date.now() / 1000) }` : null,
@@ -120,29 +120,25 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     emailBody = updatedRequest
   } else emailBody = purchase
 
-  try {
-    if(process.env.NODE_ENV === 'production') { // Automated emails
-      const client = await bindServiceAcct() as Client
-  
-      if(department === 'FIRE') { // Fire
-  
-        const admins = await adminSearch(department, client) as string[]
-  
-        if(admins) {
-          sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-        }
-      }
-    
-      if(department === 'PARKS') { // Parks
-        const emails = await parksLookup(email as string, client)
-  
-        if(emails) {
-          sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-        }
+  if(process.env.NODE_ENV === 'production') { // Automated emails
+    const client = await bindServiceAcct() as Client
+
+    if(department === 'FIRE') { // Fire
+
+      const admins = await adminSearch(department, client) as string[]
+
+      if(admins) {
+        sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
       }
     }
-  } catch(err) {
-    console.log(err)
+  
+    if(department === 'PARKS') { // Parks
+      const emails = await parksLookup(email as string, client)
+
+      if(emails) {
+        sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
+      }
+    }
   }
 
   const reconciliation = await Reconciliation.create({ // Create reconciliation entry
@@ -168,7 +164,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
 export const updatePurchase = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdatePurchaseRequest>, res: Response<UpdatePurchaseResponse>, next: NextFunction) => {
   const { purchaseLocation, purchaseDetails, vendor, purchaseAmount, lastFour } = req.body
 
-  const email = req.user?.email
+  const email = req.entra?.preferred_username
 
   const purchase = await Purchase.update({
     purchaseLocation,

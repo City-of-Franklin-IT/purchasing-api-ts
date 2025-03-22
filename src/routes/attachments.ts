@@ -1,7 +1,7 @@
 import { Router } from "express"
 import multer from "multer"
 import { createAttachment, getAttachment, deleteAttachment } from "@controllers/attachments"
-import { protect, entra } from "@middleware/auth"
+import { entra } from "@middleware/auth"
 
 const router = Router()
 

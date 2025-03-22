@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { createOPIQ, updateOPIQ, deleteOPIQ } from "@controllers/opiq"
-import { protect, entra } from "@middleware/auth"
+import { entra } from "@middleware/auth"
 
 const router = Router()
 

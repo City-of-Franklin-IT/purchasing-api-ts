@@ -4,17 +4,21 @@ import { Attachment } from '@models/index'
 
 // Types
 import { NextFunction } from 'express'
-import { ModelStatic, Model } from 'sequelize'
+import { Metadata } from 'sharp'
 import { FileInterface, FileTypeEnum } from '@models/types'
 
 export default async (file: FileInterface, parentId: string, email: string | undefined, next: NextFunction): Promise<void> => { // Handle image upload
+  const metadata = await sharp(file.buffer).metadata()
+
+  const orientation = getOrientation(metadata)
 
   sharp(file.buffer)
-    .resize(960, 640, {
-      fit: 'inside'
-    })
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
+    .resize(orientation.height, orientation.width, {
+      fit: 'inside'
+    })
+    .rotate()
     .toBuffer(async (err, buffer, info) => {
 
       if(err) {
@@ -33,4 +37,8 @@ export default async (file: FileInterface, parentId: string, email: string | und
         return next(new ErrorResponse("Unable to upload image", 500))
       }
     })
+}
+
+const getOrientation = (orientation: Metadata) => {
+  return orientation || 0 >= 5 ? { width: 640, height: 960 } : { width: 960, height: 640 }
 }

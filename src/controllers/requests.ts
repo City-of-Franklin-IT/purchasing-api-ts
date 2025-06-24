@@ -98,7 +98,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
   const email = req.entra?.preferred_username
 
   const request = await Request.create({
-    requestId: `REQ${ getFiscalYear() }${ req.user?.department }-${ Math.floor(Date.now() / 1000) }`,
+    requestId: `REQ${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }`,
     department,
     requestLocation,
     requestDetails,
@@ -116,19 +116,11 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
   if(process.env.NODE_ENV === 'production') { // Automated emails
     const client = await bindServiceAcct() as Client
 
-    if(department === 'FIRE') { // Fire
+    if(department.toUpperCase() === 'FIRE') { // Fire
       const admins = await adminSearch(department, client) as string[]
 
       if(admins) {
         sendPendingApprovalEmail(admins, request)
-      }
-    }
-
-    if(department === 'PARKS') { // Parks
-      const emails = await parksLookup(email as string, client)
-
-      if(emails) {
-        sendPendingApprovalEmail(emails, request)
       }
     }
   }

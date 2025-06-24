@@ -3,7 +3,7 @@ import { ErrorResponse } from '../../utils/errorResponse'
 
 // Types
 import { Request, Response, NextFunction } from 'express'
-import { ValidateCookieResponse, UserInterface } from "./types"
+import { UserInterface } from "./types"
 
 export const entra = asyncHandler(async (req: Request, res: Response, next: NextFunction) => { // Validate token from Entra
   const env = process.env.NODE_ENV
@@ -32,7 +32,6 @@ export const entra = asyncHandler(async (req: Request, res: Response, next: Next
     const result = await fetch(`${ process.env.ENTRA_URL }`, { headers })
 
     if(result.status !== 200) {
-      console.log(await result.json())
       return next(new ErrorResponse('Not authorized to access this route', 401))
     }
     

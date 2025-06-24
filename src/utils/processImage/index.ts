@@ -13,12 +13,13 @@ export default async (file: FileInterface, parentId: string, email: string | und
   const orientation = getOrientation(metadata)
 
   sharp(file.buffer)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .resize(orientation.height, orientation.width, {
-      fit: 'inside'
-    })
     .rotate()
+    .toFormat('jpeg')
+    .jpeg()
+    .resize(orientation.width, orientation.height, {
+      fit: 'inside',
+      withoutEnlargement: true
+    })
     .toBuffer(async (err, buffer, info) => {
 
       if(err) {
@@ -39,6 +40,6 @@ export default async (file: FileInterface, parentId: string, email: string | und
     })
 }
 
-const getOrientation = (orientation: Metadata) => {
-  return orientation || 0 >= 5 ? { width: 640, height: 960 } : { width: 960, height: 640 }
+const getOrientation = (metadata: Metadata) => {
+  return (metadata.orientation || 0) >= 5 ? { width: 640, height: 960 } : { width: 960, height: 640 }
 }

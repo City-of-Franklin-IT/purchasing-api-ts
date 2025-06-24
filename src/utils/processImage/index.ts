@@ -41,5 +41,14 @@ export default async (file: FileInterface, parentId: string, email: string | und
 }
 
 const getOrientation = (metadata: Metadata) => {
-  return (metadata.orientation || 0) >= 5 ? { width: 640, height: 960 } : { width: 960, height: 640 }
+  const maxDimension = 1920
+  const originalWidth = metadata.width || 0
+  const originalHeight = metadata.height || 0
+  
+  if(Math.max(originalWidth, originalHeight) <= maxDimension) {
+    return { width: originalWidth, height: originalHeight }
+  }
+  
+  // Return max dimensions, Sharp will maintain aspect ratio with fit: 'inside'
+  return { width: maxDimension, height: maxDimension }
 }

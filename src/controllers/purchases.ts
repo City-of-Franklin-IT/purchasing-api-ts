@@ -1,3 +1,4 @@
+import { Op } from 'sequelize'
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Purchase, Request, Reconciliation, Attachment, OPIQ, Coding, Closed } from '@models/index'
@@ -6,6 +7,7 @@ import setPurchaseStatus from '@utils/status/setPurchaseStatus'
 import { bindServiceAcct } from '@utils/ldap'
 import { adminSearch, parksLookup } from '@utils/ldap/ldapLookups'
 import { sendPurchaseEmail } from '@utils/emails/automatedEmails'
+import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -16,15 +18,22 @@ import { GetPurchasesResponse, GetPurchaseResponse, CreatePurchaseRequest, Creat
 import setRequestStatus from '@utils/status/setRequestStatus'
 
 //@desc    Get purchases
-//@route   GET /api/v2/dept-purchasing/purchases?department=
+//@route   GET /api/v2/dept-purchasing/purchases?department=&year=
 //@access  Private
-export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
-  const department = req.query.department.toUpperCase()
+export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: number }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
+  const { department, year } = req.query
+
+  const beginDate = `${ Number(year) }-07-01`
+  const endDate = `${ Number(year) + 1 }-06-30`
 
   const purchases = await Purchase.findAll({
     where: {
-      department: DepartmentEnum[department as DepartmentEnum],
-      requestId: null
+      department: DepartmentEnum[department.toUpperCase() as DepartmentEnum],
+      requestId: null,
+      createdAt: {
+        [Op.gte]: beginDate,
+        [Op.lte]: endDate
+      }
     },
     include: [
       { model: Attachment,
@@ -78,7 +87,7 @@ export const getPurchase = asyncHandler(async (req: Req<{ uuid: string }>, res: 
 export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchaseRequest>, res: Response<CreatePurchaseResponse>, next: NextFunction) => {
   const { requestId, department, purchaseLocation, purchaseDetails, vendor, purchaseAmount, lastFour } = req.body
 
-  const email = req.entra?.preferred_username
+  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
 
   const purchase = await Purchase.create({
     purchaseId: !requestId ? `PUR${ getFiscalYear() }${ department }-${ Math.floor(Date.now() / 1000) }` : null,
@@ -90,8 +99,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     purchaseAmount,
     lastFour,
     status: !requestId ? StatusEnum.Purchased : null,
-    createdBy: email, 
-    updatedBy: email
+    ...editorTracking(req)
   }) as Model<PurchaseInterface> & PurchaseInterface
 
   if(!purchase) {
@@ -164,15 +172,13 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
 export const updatePurchase = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdatePurchaseRequest>, res: Response<UpdatePurchaseResponse>, next: NextFunction) => {
   const { purchaseLocation, purchaseDetails, vendor, purchaseAmount, lastFour } = req.body
 
-  const email = req.entra?.preferred_username
-
   const purchase = await Purchase.update({
     purchaseLocation,
     purchaseDetails,
     vendor,
     purchaseAmount,
     lastFour,
-    updatedBy: email
+    ...editorTracking(req)
   },{
     where: {
       uuid: req.params.uuid

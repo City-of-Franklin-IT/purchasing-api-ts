@@ -1,11 +1,13 @@
+import { Op } from 'sequelize'
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Request, Approval, Purchase, Attachment, Reconciliation, OPIQ, Coding, Closed, Delegate } from '@models/index'
 import getFiscalYear from '@utils/getFiscalYear'
 import { bindServiceAcct } from '@utils/ldap'
 import setRequestStatus from '@utils/status/setRequestStatus'
-import { adminSearch, parksLookup } from '@utils/ldap/ldapLookups'
+import { adminSearch } from '@utils/ldap/ldapLookups'
 import { sendPendingApprovalEmail } from '@utils/emails/automatedEmails'
+import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -17,12 +19,19 @@ import { GetRequestsResponse, GetRequestResponse, CreateRequestRequest, CreateRe
 // @desc    Get requests
 // @route   GET /api/v2/dept-purchasing/requests?department=
 // @access  Private
-export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department: string }>, res: Response<GetRequestsResponse>, next: NextFunction) => {
-  const department = req.query.department.toUpperCase()
+export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: number }>, res: Response<GetRequestsResponse>, next: NextFunction) => {
+  const { department, year } = req.query
+
+  const beginDate = `${ Number(year) }-07-01`
+  const endDate = `${ Number(year) + 1 }-06-30`
 
   const requests = await Request.findAll({
     where: {
-      department: DepartmentEnum[department as DepartmentEnum]
+      department: DepartmentEnum[department as DepartmentEnum],
+      createdAt: {
+        [Op.gte]: beginDate,
+        [Op.lte]: endDate
+      }
     },
     include: [
       { model: Purchase,
@@ -95,7 +104,7 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
 export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestRequest>, res: Response<CreateRequestResponse>, next: NextFunction) => {
   const { department, requestLocation, requestDetails, vendor, requestAmount, weblink } = req.body
 
-  const email = req.entra?.preferred_username
+  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
 
   const request = await Request.create({
     requestId: `REQ${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }`,
@@ -105,8 +114,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
     vendor,
     requestAmount,
     weblink,
-    createdBy: email,
-    updatedBy: email
+    ...editorTracking(req)
   }) as Model<RequestInterface> & RequestInterface
 
   if(!request) {
@@ -148,9 +156,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
 //@route   PUT /api/v2/dept-purchasing/requests/:uuid
 //@access  Private
 export const updateRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: Response<ControllerResponse>, next: NextFunction) => {
-  const { requestLocation, requestDetails, vendor, requestAmount, weblink,  updatedAt } = req.body
-
-  const email = req.entra?.preferred_username
+  const { requestLocation, requestDetails, vendor, requestAmount, weblink } = req.body
 
   const request = await Request.update({
     requestLocation,
@@ -158,8 +164,7 @@ export const updateRequest = asyncHandler(async (req: Req<{ uuid: string }>, res
     vendor,
     requestAmount,
     weblink,
-    updatedBy: email,
-    updatedAt
+    ...editorTracking(req)
   },{
     where: {
       uuid: req.params.uuid

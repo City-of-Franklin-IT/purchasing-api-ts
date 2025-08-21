@@ -1,6 +1,7 @@
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Coding } from '@models/index'
+import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -14,13 +15,10 @@ import { ControllerResponse, CreateCodingRequest, CreateCodingResponse, UpdateCo
 export const createCode = asyncHandler(async (req: Req<{}, {}, CreateCodingRequest>, res: Response<CreateCodingResponse>, next: NextFunction) => {
   const { parentId, code } = req.body
 
-  const email = req.entra?.preferred_username
-
   const result = await Coding.create({
     parentId,
     code,
-    createdBy: email,
-    updatedBy: email,
+    ...editorTracking(req)
   }) as Model<CodingInterface> & CodingInterface
 
   if(!result) {
@@ -40,11 +38,9 @@ export const createCode = asyncHandler(async (req: Req<{}, {}, CreateCodingReque
 export const updateCode = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateCodingRequest>, res: Response<UpdateCodingResponse>, next: NextFunction) => {
   const { code } = req.body
 
-  const email = req.entra?.preferred_username
-
   const result = await Coding.update({
     code,
-    updatedBy: email
+    ...editorTracking(req)
   },{
     where: {
       uuid: req.params.uuid

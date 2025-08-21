@@ -2,6 +2,7 @@ import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Delegate, Request } from '@models/index'
 import { sendStatusEmail } from '@utils/emails/automatedEmails'
+import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -15,12 +16,9 @@ import { ControllerResponse, CreateDelegateRequest, CreateDelegateResponse, Upda
 export const createDelegate = asyncHandler(async (req: Req<{}, {}, CreateDelegateRequest>, res: Response<CreateDelegateResponse>, next: NextFunction) => {
   const { requestId } = req.body
 
-  const email = req.entra?.preferred_username
-
   const delegate = await Delegate.create({
     requestId,
-    createdBy: email,
-    updatedBy: email
+    ...editorTracking(req)
   }) as Model<DelegateInterface> & DelegateInterface
 
   if(!delegate) {
@@ -39,11 +37,9 @@ export const createDelegate = asyncHandler(async (req: Req<{}, {}, CreateDelegat
 export const updateDelegate = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateDelegateRequest>, res: Response<UpdateDelegateResponse>, next: NextFunction) => {
   const { delegateEmail } = req.body
 
-  const email = req.entra?.preferred_username
-
   const delegate = await Delegate.update({
     delegateEmail,
-    updatedBy: email
+    ...editorTracking(req)
   },{
     where: {
       uuid: req.params.uuid

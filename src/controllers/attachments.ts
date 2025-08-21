@@ -39,7 +39,7 @@ export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttac
   const { file } = req
   const { parentId } = req.body
 
-  const email = req.entra?.preferred_username
+  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
 
   const fileType = determineFileType(file?.buffer)
 

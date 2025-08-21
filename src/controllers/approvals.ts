@@ -3,6 +3,7 @@ import { ErrorResponse } from '@utils/errorResponse'
 import setRequestStatus from '@utils/status/setRequestStatus'
 import { Approval, Request } from '@models/index'
 import { sendStatusEmail, sendPendingApprovalEmail } from '@utils/emails/automatedEmails'
+import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -16,15 +17,13 @@ import { ApprovalInterface, RequestInterface } from '@models/types'
 export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateApprovalRequest>, res: Response<UpdateApprovalResponse>, next: NextFunction) => {
   const { primaryApproval, primaryApprovalEmail, secondaryApproval, secondaryApprovalEmail, requiresAP } = req.body
 
-  const email = req.entra?.preferred_username
-
   const approval = await Approval.update({
     primaryApproval,
     primaryApprovalEmail,
     secondaryApproval,
     secondaryApprovalEmail,
     requiresAP,
-    updatedBy: email
+    ...editorTracking(req)
   },{
     where: {
       uuid: req.params.uuid

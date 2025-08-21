@@ -1,6 +1,7 @@
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { OPIQ } from '@models/index'
+import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -14,13 +15,10 @@ import { ControllerResponse, CreateOPIQRequest, CreateOPIQResponse, UpdateOPIQRe
 export const createOPIQ = asyncHandler(async (req: Req<{}, {}, CreateOPIQRequest>, res: Response<CreateOPIQResponse>, next: NextFunction) => {
   const { parentId, opiqNum } = req.body
 
-  const email = req.entra?.preferred_username
-
   const opiq = await OPIQ.create({
     parentId,
     opiqNum,
-    createdBy: email,
-    updatedBy: email
+    ...editorTracking(req)
   }) as Model<OPIQInterface> & OPIQInterface
 
   if(!opiq) {
@@ -40,11 +38,9 @@ export const createOPIQ = asyncHandler(async (req: Req<{}, {}, CreateOPIQRequest
 export const updateOPIQ = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateOPIQRequest>, res: Response<UpdateOPIQResponse>, next: NextFunction) => {
   const { opiqNum } = req.body
 
-  const email = req.entra?.preferred_username
-
   const opiq = await OPIQ.update({
     opiqNum,
-    updatedBy: email
+    ...editorTracking(req)
   },{
     where: {
       uuid: req.params.uuid

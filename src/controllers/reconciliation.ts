@@ -3,6 +3,7 @@ import { ErrorResponse } from '@utils/errorResponse'
 import { Reconciliation, Request, Purchase } from '@models/index'
 import setRequestStatus from '@utils/status/setRequestStatus'
 import setPurchaseStatus from '@utils/status/setPurchaseStatus'
+import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
@@ -16,11 +17,9 @@ import { UpdateReconciliationRequest, UpdateReconciliationResponse } from './typ
 export const updateReconciliation = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateReconciliationRequest>, res: Response<UpdateReconciliationResponse>, next: NextFunction) => {
   const { reconciled } = req.body
 
-  const email = req.entra?.preferred_username
-
   const reconciliation = await Reconciliation.update({
     reconciled,
-    updatedBy: email
+    ...editorTracking(req)
   },{
     where: {
       uuid: req.params.uuid

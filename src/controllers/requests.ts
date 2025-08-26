@@ -124,7 +124,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
   if(process.env.NODE_ENV === 'production') { // Automated emails
     const client = await bindServiceAcct() as Client
 
-    if(department.toUpperCase() === 'FIRE') { // Fire
+    if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'PD') { // Fire / PD
       const admins = await adminSearch(department, client) as string[]
 
       if(admins) {

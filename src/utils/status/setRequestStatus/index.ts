@@ -74,10 +74,13 @@ const handleRequestApprovalStatus = (Approval: ApprovalInterface) => {
       switch(secondaryApproval) {
         case true:
           approvalStatus = StatusEnum.Approved
+          break
         case false:
           approvalStatus = StatusEnum.Denied
+          break
         default:
           approvalStatus = StatusEnum.PendingSecondaryApproval
+          break
       }
     } else approvalStatus = StatusEnum.Approved
 

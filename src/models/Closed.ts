@@ -8,6 +8,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
   class Closed extends Model<ClosedInterface, ClosedCreationAttributes> {
     declare parentId: string
+    declare closed: boolean
     declare comments: string
     declare uuid: string
     declare createdBy: string
@@ -28,6 +29,12 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     parentId: {
       type: DataTypes.UUID,
       allowNull: false
+    },
+    closed: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return true
+      }
     },
     comments: {
       type: DataTypes.STRING

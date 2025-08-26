@@ -131,7 +131,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
   if(process.env.NODE_ENV === 'production') { // Automated emails
     const client = await bindServiceAcct() as Client
 
-    if(department === 'FIRE') { // Fire
+    if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'PD') { // Fire / PD
 
       const admins = await adminSearch(department, client) as string[]
 
@@ -140,7 +140,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
       }
     }
   
-    if(department === 'PARKS') { // Parks
+    if(department.toUpperCase() === 'PARKS') { // Parks
       const emails = await parksLookup(email as string, client)
 
       if(emails) {

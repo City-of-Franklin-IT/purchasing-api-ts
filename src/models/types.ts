@@ -22,10 +22,11 @@ export interface AttachmentCreationAttributes extends Optional<AttachmentInterfa
 
 export interface ClosedInterface extends BaseInterface {
   parentId: string
+  readonly closed: boolean
   comments: string | null
 }
 
-export interface ClosedCreationAttributes extends Optional<ClosedInterface, 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
+export interface ClosedCreationAttributes extends Optional<ClosedInterface, 'closed' | 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
 
 export interface CodingInterface extends BaseInterface {
   parentId: string
@@ -105,7 +106,8 @@ export enum FileTypeEnum {
 export enum DepartmentEnum {
   IT = 'IT',
   PARKS = 'PARKS',
-  FIRE = 'FIRE'
+  FIRE = 'FIRE',
+  PD = 'PD'
 }
 
 export enum StatusEnum {

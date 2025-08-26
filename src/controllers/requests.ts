@@ -22,7 +22,7 @@ import { GetRequestsResponse, GetRequestResponse, CreateRequestRequest, CreateRe
 export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetRequestsResponse>, next: NextFunction) => {
   const { department, year } = req.query
 
-  const createdAtFilter = year !== 'all' ? {
+  const createdAtFilter = Number(year) !== 1 ? {
     createdAt: {
       [Op.gte]: new Date(`${ Number(year) - 1 }-07-01`),
       [Op.lte]: new Date(`${ Number(year) }-06-30T23:59:59.999Z`)
@@ -31,7 +31,7 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
 
   const requests = await Request.findAll({
     where: {
-      department: DepartmentEnum[department as DepartmentEnum],
+      department: DepartmentEnum[department.toUpperCase() as DepartmentEnum],
       ...createdAtFilter
     },
     include: [

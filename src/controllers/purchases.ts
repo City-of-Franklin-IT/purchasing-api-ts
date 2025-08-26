@@ -23,7 +23,7 @@ import setRequestStatus from '@utils/status/setRequestStatus'
 export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
   const { department, year } = req.query
 
-  const createdAtFilter = year !== 'all' ? {
+  const createdAtFilter = Number(year) !== 1 ? {
     createdAt: {
       [Op.gte]: new Date(`${ Number(year) - 1 }-07-01`),
       [Op.lte]: new Date(`${ Number(year) }-06-30T23:59:59.999Z`)

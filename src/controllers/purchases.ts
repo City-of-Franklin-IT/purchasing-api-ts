@@ -20,20 +20,24 @@ import setRequestStatus from '@utils/status/setRequestStatus'
 //@desc    Get purchases
 //@route   GET /api/v2/dept-purchasing/purchases?department=&year=
 //@access  Private
-export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: number }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
+export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
   const { department, year } = req.query
 
   const beginDate = `${ Number(year) }-07-01`
   const endDate = `${ Number(year) + 1 }-06-30`
 
+  const createdAtFilter = year !== 'all' ? {
+    createdAt: {
+        [Op.gte]: beginDate,
+        [Op.lte]: endDate
+      }
+  } : undefined
+
   const purchases = await Purchase.findAll({
     where: {
       department: DepartmentEnum[department.toUpperCase() as DepartmentEnum],
       requestId: null,
-      createdAt: {
-        [Op.gte]: beginDate,
-        [Op.lte]: endDate
-      }
+      ...createdAtFilter
     },
     include: [
       { model: Attachment,

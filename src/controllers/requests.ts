@@ -19,19 +19,23 @@ import { GetRequestsResponse, GetRequestResponse, CreateRequestRequest, CreateRe
 // @desc    Get requests
 // @route   GET /api/v2/dept-purchasing/requests?department=
 // @access  Private
-export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: number }>, res: Response<GetRequestsResponse>, next: NextFunction) => {
+export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetRequestsResponse>, next: NextFunction) => {
   const { department, year } = req.query
 
   const beginDate = `${ Number(year) }-07-01`
   const endDate = `${ Number(year) + 1 }-06-30`
 
-  const requests = await Request.findAll({
-    where: {
-      department: DepartmentEnum[department as DepartmentEnum],
-      createdAt: {
+  const createdAtFilter = year !== 'all' ? {
+    createdAt: {
         [Op.gte]: beginDate,
         [Op.lte]: endDate
       }
+  } : undefined
+
+  const requests = await Request.findAll({
+    where: {
+      department: DepartmentEnum[department as DepartmentEnum],
+      ...createdAtFilter
     },
     include: [
       { model: Purchase,

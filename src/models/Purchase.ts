@@ -2,14 +2,14 @@
 
 // Types
 import { Sequelize, Model, ModelStatic, DataTypes } from "sequelize"
-import { PurchaseInterface, PurchaseCreationAttributes, AttachmentInterface, OPIQInterface, CodingInterface, ClosedInterface, ReconciliationInterface, DepartmentEnum, StatusEnum } from './types'
+import { PurchaseInterface, PurchaseCreationAttributes, AttachmentInterface, OPIQInterface, CodingInterface, ClosedInterface, ReconciliationInterface, StatusEnum } from './types'
 
 export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
   class Purchase extends Model<PurchaseInterface, PurchaseCreationAttributes> {
     declare purchaseId: string | null
     declare requestId: string | null
-    declare department: DepartmentEnum
+    declare department: string
     declare purchaseLocation: string
     declare purchaseDetails: string
     declare vendor: string
@@ -44,7 +44,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
       allowNull: true
     },
     department: {
-      type: DataTypes.ENUM(...Object.values(DepartmentEnum))
+      type: DataTypes.STRING
     },
     purchaseLocation: {
       type: DataTypes.STRING

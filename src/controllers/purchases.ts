@@ -93,7 +93,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
   const purchase = await Purchase.create({
     purchaseId: !requestId ? `PUR${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }` : null,
     requestId,
-    department: department.toUpperCase() as DepartmentEnum,
+    department: department.toUpperCase(),
     purchaseLocation,
     purchaseDetails,
     vendor,

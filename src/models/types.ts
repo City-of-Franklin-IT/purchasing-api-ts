@@ -103,13 +103,6 @@ export enum FileTypeEnum {
   jpeg = 'jpeg'
 }
 
-export enum DepartmentEnum {
-  IT = 'IT',
-  PARKS = 'PARKS',
-  FIRE = 'FIRE',
-  PD = 'POLICE'
-}
-
 export enum StatusEnum {
   Purchased = 'Purchased',
   Pending = 'Pending',

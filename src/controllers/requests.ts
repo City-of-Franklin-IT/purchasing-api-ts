@@ -31,7 +31,7 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
 
   const requests = await Request.findAll({
     where: {
-      department: DepartmentEnum[department.toUpperCase() as DepartmentEnum],
+      department: department.toUpperCase() as DepartmentEnum,
       ...createdAtFilter
     },
     include: [
@@ -109,7 +109,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
 
   const request = await Request.create({
     requestId: `REQ${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }`,
-    department,
+    department: department.toUpperCase() as DepartmentEnum,
     requestLocation,
     requestDetails,
     vendor,

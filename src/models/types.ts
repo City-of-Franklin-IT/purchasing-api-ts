@@ -107,7 +107,7 @@ export enum DepartmentEnum {
   IT = 'IT',
   PARKS = 'PARKS',
   FIRE = 'FIRE',
-  PD = 'PD'
+  PD = 'POLICE'
 }
 
 export enum StatusEnum {

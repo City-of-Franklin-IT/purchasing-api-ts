@@ -52,7 +52,7 @@ export interface OPIQCreationAttributes extends Optional<OPIQInterface, 'uuid' |
 export interface PurchaseInterface extends BaseInterface {
   purchaseId: string | null
   requestId: string | null
-  department: DepartmentEnum
+  department: string
   purchaseLocation: string
   purchaseDetails: string
   vendor: string
@@ -77,7 +77,7 @@ export interface ReconciliationCreationAttributes extends Optional<Reconciliatio
 
 export interface RequestInterface extends BaseInterface {
   requestId: string
-  department: DepartmentEnum
+  department: string
   requestLocation: string
   requestDetails: string
   vendor: string

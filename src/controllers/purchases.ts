@@ -13,7 +13,7 @@ import editorTracking from '@utils/editorTracking'
 import { Request as Req, Response, NextFunction } from 'express'
 import { Model } from 'sequelize'
 import { Client } from 'ldapjs'
-import { DepartmentEnum, PurchaseInterface, RequestInterface, StatusEnum } from '@models/types'
+import { PurchaseInterface, RequestInterface, StatusEnum } from '@models/types'
 import { GetPurchasesResponse, GetPurchaseResponse, CreatePurchaseRequest, CreatePurchaseResponse, UpdatePurchaseRequest, UpdatePurchaseResponse, ControllerResponse } from './types'
 import setRequestStatus from '@utils/status/setRequestStatus'
 
@@ -32,7 +32,7 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
 
   const purchases = await Purchase.findAll({
     where: {
-      department: department.toUpperCase() as DepartmentEnum,
+      department,
       requestId: null,
       ...createdAtFilter
     },

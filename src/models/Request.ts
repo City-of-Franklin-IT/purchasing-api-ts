@@ -2,13 +2,13 @@
 
 // Types
 import { Sequelize, Model, ModelStatic, DataTypes } from "sequelize"
-import { RequestInterface, RequestCreationAttributes, PurchaseInterface, ApprovalInterface, AttachmentInterface, DelegateInterface, DepartmentEnum, StatusEnum } from './types'
+import { RequestInterface, RequestCreationAttributes, PurchaseInterface, ApprovalInterface, AttachmentInterface, DelegateInterface, StatusEnum } from './types'
 
 export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
   class Request extends Model<RequestInterface, RequestCreationAttributes> {
     declare requestId: string
-    declare department: DepartmentEnum
+    declare department: string
     declare requestLocation: string
     declare requestDetails: string
     declare vendor: string

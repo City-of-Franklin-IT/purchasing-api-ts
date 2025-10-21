@@ -1,9 +1,6 @@
 import ldap from 'ldapjs'
 
-// Types
-import { DepartmentEnum } from '@models/types'
-
-export const adminSearch = async (dept: DepartmentEnum, client: ldap.Client): Promise<unknown> => { // Search department admins
+export const adminSearch = async (dept: string, client: ldap.Client): Promise<unknown> => { // Search department admins
 
   return new Promise((resolve, reject) => {
     const items: string[] = []
@@ -62,7 +59,7 @@ export const employeeSearch = async (property: string, value: string, client: ld
   })
 }
 
-export const searchByJobTitle = async (jobTitle: string, department: DepartmentEnum, client: ldap.Client) => { // Search by job title - return email
+export const searchByJobTitle = async (jobTitle: string, department: string, client: ldap.Client) => { // Search by job title - return email
   
   return new Promise((resolve, reject) => {
 
@@ -119,13 +116,13 @@ export const parksLookup = async (employee: string, client: ldap.Client) => { //
       }
     }
 
-    const admins = await adminSearch(DepartmentEnum.PARKS, client) as string[] // Get admins from 
+    const admins = await adminSearch('PARKS', client) as string[] // Get admins from 
 
     if(admins.length) {
       emails.push(...admins)
     }
 
-    const inventorySpecialist = await searchByJobTitle('Inventory Specialist', DepartmentEnum.PARKS, client) as string[]
+    const inventorySpecialist = await searchByJobTitle('Inventory Specialist', 'PARKS', client) as string[]
 
     if(inventorySpecialist.length) {
       emails.push(inventorySpecialist[0])

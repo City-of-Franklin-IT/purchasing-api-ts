@@ -1,6 +1,6 @@
 // Types
 import { Model } from "sequelize"
-import { ApprovalInterface, AttachmentInterface, CodingInterface, DelegateInterface, DepartmentEnum, OPIQInterface, PurchaseInterface, ReconciliationInterface, RequestInterface, StatusEnum } from "@models/types"
+import { ApprovalInterface, AttachmentInterface, CodingInterface, DelegateInterface, OPIQInterface, PurchaseInterface, ReconciliationInterface, RequestInterface, StatusEnum } from "@models/types"
 
 export interface UpdateApprovalRequest {
   primaryApproval: boolean | null
@@ -96,7 +96,7 @@ export interface GetPurchaseResponse {
 export interface CreatePurchaseRequest {
   purchaseId: string| null
   requestId: string | null
-  department: DepartmentEnum
+  department: string
   purchaseLocation: string
   purchaseDetails: string
   vendor: string
@@ -141,7 +141,7 @@ export interface GetRequestResponse {
 }
 
 export interface CreateRequestRequest {
-  department: DepartmentEnum
+  department: string
   requestLocation: string
   requestDetails: string
   vendor: string

@@ -13,7 +13,7 @@ import editorTracking from '@utils/editorTracking'
 import { Request as Req, Response, NextFunction } from 'express'
 import { Model } from 'sequelize'
 import { Client } from 'ldapjs'
-import { RequestInterface, DepartmentEnum } from '@models/types'
+import { RequestInterface } from '@models/types'
 import { GetRequestsResponse, GetRequestResponse, CreateRequestRequest, CreateRequestResponse, ControllerResponse } from './types'
 
 // @desc    Get requests
@@ -31,7 +31,7 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
 
   const requests = await Request.findAll({
     where: {
-      department: department.toUpperCase() as DepartmentEnum,
+      department,
       ...createdAtFilter
     },
     include: [

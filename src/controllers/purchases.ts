@@ -91,9 +91,9 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
   const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
 
   const purchase = await Purchase.create({
-    purchaseId: !requestId ? `PUR${ getFiscalYear() }${ department }-${ Math.floor(Date.now() / 1000) }` : null,
+    purchaseId: !requestId ? `PUR${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }` : null,
     requestId,
-    department,
+    department: department.toUpperCase(),
     purchaseLocation,
     purchaseDetails,
     vendor,

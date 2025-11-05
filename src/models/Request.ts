@@ -41,7 +41,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     department: {
       type: DataTypes.STRING,
       allowNull: false,
-      values: ['IT', 'PARKS', 'FIRE', 'PD']
+      values: ['IT', 'PARKS', 'FIRE', 'POLICE']
     },
     requestLocation: {
       type: DataTypes.STRING,

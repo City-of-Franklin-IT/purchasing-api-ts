@@ -145,7 +145,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
       try {
         const client = await bindServiceAcct() as Client
 
-        if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'PD') { // Fire / PD
+        if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'POLICE') { // Fire / PD
           try {
             const admins = await adminSearch(department, client) as string[]
 

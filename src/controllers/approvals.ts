@@ -51,15 +51,21 @@ export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {},
     return next (new ErrorResponse(`Unable to update request status by request uuid ${ request.uuid }`, 500))
   }
 
-  if(updatedRequest.status === 'Pending Secondary Approval' && secondaryApprovalEmail) {
-    sendPendingApprovalEmail([secondaryApprovalEmail], updatedRequest)
-  }
-
-  sendStatusEmail(updatedRequest)
-
   res.status(200).json({
     success: true,
     msg: 'Approval Updated',
     data
+  })
+
+  setImmediate(() => {
+    try {
+      if(updatedRequest.status === 'Pending Secondary Approval' && secondaryApprovalEmail) {
+        sendPendingApprovalEmail([secondaryApprovalEmail], updatedRequest)
+      }
+
+      sendStatusEmail(updatedRequest)
+    } catch (error) {
+      console.error('Error sending approval emails:', error)
+    }
   })
 })

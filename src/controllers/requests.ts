@@ -122,18 +122,6 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
     return next(new ErrorResponse("Unable to create new request", 500))
   }
 
-  if(process.env.NODE_ENV === 'production') { // Automated emails
-    const client = await bindServiceAcct() as Client
-
-    if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'PD') { // Fire / PD
-      const admins = await adminSearch(department, client) as string[]
-
-      if(admins) {
-        sendPendingApprovalEmail(admins, request)
-      }
-    }
-  }
-
   const { requestId } = request
 
   const approval = await Approval.create({
@@ -151,6 +139,28 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
     msg: 'Request Created',
     data: request
   })
+
+  if(process.env.NODE_ENV === 'production') {
+    setImmediate(async () => {
+      try {
+        const client = await bindServiceAcct() as Client
+
+        if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'PD') { // Fire / PD
+          try {
+            const admins = await adminSearch(department, client) as string[]
+
+            if(admins) {
+              sendPendingApprovalEmail(admins, request)
+            }
+          } catch (error) {
+            console.error(`Error sending pending approval email for ${department}:`, error)
+          }
+        }
+      } catch (error) {
+        console.error('Error in automated email process:', error)
+      }
+    })
+  }
 })
 
 //@desc    Update Request

@@ -64,11 +64,17 @@ export const updateDelegate = asyncHandler(async (req: Req<{ uuid: string }, {},
     }
   }) as Model<RequestInterface> & RequestInterface
 
-  sendStatusEmail(request)
-
   res.status(200).json({
     success: true,
     data
+  })
+
+  setImmediate(() => {
+    try {
+      sendStatusEmail(request)
+    } catch (error) {
+      console.error('Error sending status email:', error)
+    }
   })
 })
 

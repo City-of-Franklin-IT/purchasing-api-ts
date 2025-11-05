@@ -129,27 +129,6 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     emailBody = updatedRequest
   } else emailBody = purchase
 
-  if(process.env.NODE_ENV === 'production') { // Automated emails
-    const client = await bindServiceAcct() as Client
-
-    if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'PD') { // Fire / PD
-
-      const admins = await adminSearch(department, client) as string[]
-
-      if(admins) {
-        sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-      }
-    }
-  
-    if(department.toUpperCase() === 'PARKS') { // Parks
-      const emails = await parksLookup(email as string, client)
-
-      if(emails) {
-        sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-      }
-    }
-  }
-
   const reconciliation = await Reconciliation.create({ // Create reconciliation entry
     parentId: purchase.uuid,
     createdBy: email,
@@ -165,6 +144,40 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     msg: 'Purchase Created',
     data: purchase
   })
+
+  if(process.env.NODE_ENV === 'production') { // Automated emails
+    setImmediate(async () => {
+      try {
+        const client = await bindServiceAcct() as Client
+
+        if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'POLICE') { // Fire / PD
+          try {
+            const admins = await adminSearch(department, client) as string[]
+
+            if(admins) {
+              sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
+            }
+          } catch (error) {
+            console.error(`Error sending email for ${department}:`, error)
+          }
+        }
+
+        if(department.toUpperCase() === 'PARKS') { // Parks
+          try {
+            const emails = await parksLookup(email as string, client)
+
+            if(emails) {
+              sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
+            }
+          } catch (error) {
+            console.error('Error sending email for PARKS:', error)
+          }
+        }
+      } catch (error) {
+        console.error('Error in automated email process:', error)
+      }
+    })
+  }
 })
 
 //@desc    Update purchase

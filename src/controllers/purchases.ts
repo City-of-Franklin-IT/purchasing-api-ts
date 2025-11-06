@@ -147,34 +147,22 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
 
   if(process.env.NODE_ENV === 'production') { // Automated emails
     setImmediate(async () => {
-      try {
-        const client = await bindServiceAcct() as Client
+      const client = await bindServiceAcct() as Client
 
-        if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'POLICE') { // Fire / PD
-          try {
-            const admins = await adminSearch(department, client) as string[]
+      if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'POLICE') { // Fire / PD
+        const admins = await adminSearch(department, client) as string[]
 
-            if(admins) {
-              sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-            }
-          } catch (error) {
-            console.error(`Error sending email for ${department}:`, error)
-          }
+        if(admins) {
+          sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
         }
+      }
 
-        if(department.toUpperCase() === 'PARKS') { // Parks
-          try {
-            const emails = await parksLookup(email as string, client)
+      if(department.toUpperCase() === 'PARKS') { // Parks
+        const emails = await parksLookup(email as string, client)
 
-            if(emails) {
-              sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-            }
-          } catch (error) {
-            console.error('Error sending email for PARKS:', error)
-          }
+        if(emails) {
+          sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
         }
-      } catch (error) {
-        console.error('Error in automated email process:', error)
       }
     })
   }

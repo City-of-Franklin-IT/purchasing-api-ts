@@ -35,26 +35,41 @@ export const getAttachment = asyncHandler(async (req: Req<{ uuid: string }>, res
 //@desc    Create attachment
 //@route   POST /api/v2/dept-purchasing/attachments
 //@access  Private
-export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttachmentRequest>, res: Response<ControllerResponse>, next: NextFunction) => {
-  const { file } = req
-  const { parentId } = req.body
+export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttachmentRequest>, res: Response<ControllerResponse|{ success: boolean, msg: string }>, next: NextFunction) => {
+  try {
+    console.log('=== Request Debug ===')
+    console.log('Content-Type:', req.headers['content-type'])
+    console.log('Authorization present:', !!req.headers.authorization)
+    console.log('Body:', req.body)
+    console.log('File:', req.file)
+    console.log('File buffer length:', req.file?.buffer?.length)
+    console.log('===================')
 
-  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
+    const { file } = req
+    const { parentId } = req.body
 
-  const fileType = determineFileType(file?.buffer)
+    const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
 
-  if(!fileType) {
-    return next(new ErrorResponse("Unable to upload file - wrong file type", 500))
+    const fileType = determineFileType(file?.buffer)
+
+    if(!fileType) {
+      return next(new ErrorResponse("Unable to upload file - wrong file type", 500))
+    }
+
+    if(fileType.type === 'image') { 
+      processImage(file as unknown as FileInterface, parentId, email, next) // Image
+    } else processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
+
+    res.status(201).json({
+      success: true,
+      msg: 'File uploaded'
+    })
+  } catch(err) {
+    res.status(500).json({
+      success: false,
+      msg: 'Attachment Failed'
+    })
   }
-
-  if(fileType.type === 'image') { 
-    processImage(file as unknown as FileInterface, parentId, email, next) // Image
-  } else processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
-
-  res.status(201).json({
-    success: true,
-    msg: 'File uploaded'
-  })
 })
 
 //@desc    Delete attachment

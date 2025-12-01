@@ -18,10 +18,10 @@ import { GetPurchasesResponse, GetPurchaseResponse, CreatePurchaseRequest, Creat
 import setRequestStatus from '@utils/status/setRequestStatus'
 
 //@desc    Get purchases
-//@route   GET /api/v2/dept-purchasing/purchases?department=&year=
+//@route   GET /api/v2/dept-purchasing/purchases?department=&year=&createdBy=
 //@access  Private
-export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
-  const { department, year } = req.query
+export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string, createdBy?: string }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
+  const { department, year, createdBy } = req.query
 
   const createdAtFilter = Number(year) !== 1 ? {
     createdAt: {
@@ -30,11 +30,28 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
     }
   } : undefined
 
+  const setCreatedByFilter = (createdBy: string | undefined) => {
+    if(!createdBy) return null
+
+    if(!req.user?.role.includes('task.admin')) {
+      return {
+        createdBy
+      }
+    } else return { // For admin - return all 
+      createdBy: {
+        [Op.like]: '%'
+      }
+    }
+  }
+
+  const createdByFilter = setCreatedByFilter(createdBy)
+
   const purchases = await Purchase.findAll({
     where: {
       department,
       requestId: null,
-      ...createdAtFilter
+      ...createdAtFilter,
+      ...createdByFilter
     },
     include: [
       { model: Attachment,

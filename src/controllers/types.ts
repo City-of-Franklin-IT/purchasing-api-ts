@@ -106,7 +106,7 @@ export interface CreatePurchaseRequest {
 }
 
 export interface CreatePurchaseResponse extends ControllerResponse {
-  data: Model<PurchaseInterface> & PurchaseInterface
+  data: Model<PurchaseInterface> & PurchaseInterface | undefined
 }
 
 export interface UpdatePurchaseRequest {

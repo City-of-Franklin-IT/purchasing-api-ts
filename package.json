@@ -4,9 +4,10 @@
   "description": "TypeScript built REST API for purchasing application",
   "main": "app.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "dev": "nodemon -r tsconfig-paths/register src/app.ts",
-    "start": "npx tsx dist/app.js --port 6000"
+    "deploy": "rsync -av --delete dist/ andrew@cofasv30:~/builds/purchasing-api-ts/dist/ && rsync -av package.json package-lock.json andrew@cofasv30:~/builds/purchasing-api-ts/ && ssh andrew@cofasv30 'pm2 restart purchasing-api-ts'",
+    "start": "npx tsx dist/app.js"
   },
   "author": "Andrew Southern",
   "license": "ISC",
@@ -21,6 +22,7 @@
     "@types/nodemailer": "^6.4.17",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"
   },

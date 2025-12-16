@@ -14,7 +14,6 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024 // 10MB
   },
   fileFilter: (req, file, cb) => {
-    console.log('Multer received file: ', file.originalname)
     cb(null, true)
   }
 }).single('file')
@@ -23,21 +22,11 @@ router
   .post('/', (req, res, next) => {
     upload(req, res, (err) => {
       if(err) {
-        console.log('Multer error: ', err)
         return next(new ErrorResponse('Attachment upload failed', 400))
       }
       next()
     })
   }, createAttachment)
-
-// router
-//   .post('/', multer({ 
-//     storage: multer.memoryStorage(),
-//     fileFilter: (req, file, cb) => {
-//       console.log('Multer received file: ', file.originalname)
-//       cb(null, true)
-//     } 
-//   }).single('file'), createAttachment)
 
 router
   .route('/:uuid')

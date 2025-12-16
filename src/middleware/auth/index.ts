@@ -39,8 +39,6 @@ export const entra = asyncHandler(async (req: Request, res: Response, next: Next
 
     req.entra = data.data
 
-    console.log(data.data)
-
     return next()
   }
 })

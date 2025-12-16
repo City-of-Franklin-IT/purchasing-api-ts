@@ -1,7 +1,4 @@
 export default (buffer: Buffer | undefined) => {
-  // Check if buffer is valid
-  console.log(buffer)
-
   if(!Buffer.isBuffer(buffer) || buffer.length < 8) {
     throw new Error('Invalid file buffer')
   }

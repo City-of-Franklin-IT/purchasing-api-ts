@@ -31,17 +31,9 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
   } : undefined
 
   const setCreatedByFilter = (createdBy: string | undefined) => {
-    if(!createdBy) return null
+    if(!createdBy || req.entra?.roles.includes('task.admin')) return null
 
-    if(!req.user?.role.includes('task.admin')) {
-      return {
-        createdBy
-      }
-    } else return { // For admin - return all 
-      createdBy: {
-        [Op.like]: '%'
-      }
-    }
+    return { createdBy }
   }
 
   const createdByFilter = setCreatedByFilter(createdBy)

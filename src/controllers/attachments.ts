@@ -37,14 +37,6 @@ export const getAttachment = asyncHandler(async (req: Req<{ uuid: string }>, res
 //@access  Private
 export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttachmentRequest>, res: Response<ControllerResponse|{ success: boolean, msg: string }>, next: NextFunction) => {
   try {
-    console.log('=== Request Debug ===')
-    console.log('Content-Type:', req.headers['content-type'])
-    console.log('Authorization present:', !!req.headers.authorization)
-    console.log('Body:', req.body)
-    console.log('File:', req.file)
-    console.log('File buffer length:', req.file?.buffer?.length)
-    console.log('===================')
-
     const { file } = req
     const { parentId } = req.body
 
@@ -57,8 +49,8 @@ export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttac
     }
 
     if(fileType.type === 'image') { 
-      processImage(file as unknown as FileInterface, parentId, email, next) // Image
-    } else processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
+      await processImage(file as unknown as FileInterface, parentId, email, next) // Image
+    } else await processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
 
     res.status(201).json({
       success: true,

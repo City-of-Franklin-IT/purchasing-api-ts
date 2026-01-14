@@ -51,6 +51,11 @@ The `entra` middleware validates tokens against an external Entra service. In de
 
 Configuration is loaded from `src/config/config.env` via dotenv. Required variables include database credentials (DB_*), HOST, PORT, NODE_ENV, BASE_URL, and ENTRA_URL.
 
-## README Generation
+## Standards & Auditing
 
-When creating or updating README.md files, follow the template at `/opt/claude-standards/README_TEMPLATE.md`. This ensures consistent documentation across projects.
+When auditing or reviewing code in this project, follow the guides and templates at `/opt/claude-standards/`:
+
+- `/opt/claude-standards/README_TEMPLATE.md` - Template for creating/updating README.md files
+- `/opt/claude-standards/TYPESCRIPT_STYLE.md` - TypeScript style conventions
+- `/opt/claude-standards/IMPORT_ORGANIZATION.md` - Import ordering and organization
+- `/opt/claude-standards/VERSION_CONTROL.md` - Git and version control practices

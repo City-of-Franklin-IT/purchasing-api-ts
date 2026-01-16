@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "dev": "nodemon -r tsconfig-paths/register src/app.ts",
-    "deploy": "rsync -av --delete dist/ andrew@cofasv30:~/builds/purchasing-api-ts/dist/ && rsync -av package.json package-lock.json andrew@cofasv30:~/builds/purchasing-api-ts/ && ssh andrew@cofasv30 'pm2 restart purchasing-api-ts'",
+    "deploy": "rsync -av --delete dist/ andrew@cofasv30:/opt/builds/purchasing-api-ts/dist/ && rsync -av package.json package-lock.json andrew@cofasv30:/opt/builds/purchasing-api-ts/ && ssh andrew@cofasv30 'pm2 restart purchasing-api-ts'",
     "start": "npx tsx dist/app.js"
   },
   "author": "Andrew Southern",

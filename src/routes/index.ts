@@ -7,9 +7,12 @@ import opiq from './opiq'
 import purchases from './purchases'
 import reconciliation from './reconciliation'
 import requests from './requests'
+import makeDocsRoute from './makeDocsRoute'
 
 // Types
 import { Express, Router } from 'express'
+
+const docsRoutes = makeDocsRoute('purchasing')
 
 export default (app: Express) => {
   const baseURL = `${ process.env.BASE_URL }`
@@ -18,6 +21,7 @@ export default (app: Express) => {
     return app.use(`${ baseURL }${ path }`, router)
   }
 
+  setURL('/docs', docsRoutes)
   setURL('/approvals', approvals)
   setURL('/attachments', attachments)
   setURL('/closed', closed)

@@ -26,9 +26,7 @@ export const entra = asyncHandler(async (req: Request, res: Response, next: Next
 
   if(req.headers.authorization) {
     const headers = new Headers()
-
     headers.append('Authorization', req.headers.authorization)
-
     const result = await fetch(`${ process.env.ENTRA_URL }`, { headers })
 
     if(result.status !== 200) {
@@ -36,9 +34,8 @@ export const entra = asyncHandler(async (req: Request, res: Response, next: Next
     }
     
     const data = await result.json()
-
     req.entra = data.data
 
     return next()
-  }
+  } else return next(new ErrorResponse('Not authorized to access this route', 401))
 })

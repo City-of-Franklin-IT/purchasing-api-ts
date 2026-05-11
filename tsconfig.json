@@ -1,28 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ES2020",                                 // Modern Node.js supports recent ECMAScript features
-    "module": "CommonJS",                               // Node.js uses CommonJS by default
-    "rootDir": "./src",                                 // Where your TypeScript files live
-    "outDir": "./dist",                                 // Where your compiled JavaScript will go
-    "esModuleInterop": true,                            // Enables compatibility with CommonJS modules
-    "strict": true,                                     // Enables strict type checking
-    "skipLibCheck": true,                              // Skip type checking of declaration files
-    "forceConsistentCasingInFileNames": true,           // Ensures consistent casing of file names
-    "moduleResolution": "node",                         // Use Node.js style module resolution
-    "resolveJsonModule": true,                          // Allows importing JSON files
-    "sourceMap": true,                                  // Generates source maps for debugging
-    "baseUrl": "./src",                                 // Base directory for resolving non-relative module names
+    "target": "ES2020",
+    "module": "node16",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node16",
+    "resolveJsonModule": true,
+    "sourceMap": true,
     "typeRoots": [
       "./src/@types", 
       "./node_modules/@types"
     ],
     "paths": {
-      "@config": ["config/*"],
-      "@controllers/*": ["controllers/*"],
-      "@middleware/*": ["middleware/*"],
-      "@models/*": ["models/*"],
-      "@routes/*": ["routes/*"],
-      "@utils/*": ["utils/*"]
+      "@config": ["./src/config/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@middleware/*": ["./src/middleware/*"],
+      "@models/*": ["./src/models/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "include": [

@@ -15,6 +15,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     declare requestAmount: number
     declare weblink: string | null
     declare status: StatusEnum
+    declare requiresAP: boolean
     declare uuid: string
     declare createdBy: string
     declare createdAt: Date
@@ -23,7 +24,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
     static associate({ Purchase, Approval, Attachment, Delegate}: { Purchase: ModelStatic<Model<PurchaseInterface>>, Approval: ModelStatic<Model<ApprovalInterface>>, Attachment: ModelStatic<Model<AttachmentInterface>>, Delegate: ModelStatic<Model<DelegateInterface>> }) {
       this.hasOne(Purchase, { sourceKey: 'requestId', foreignKey: 'requestId' })
-      this.hasOne(Approval, { sourceKey: 'requestId', foreignKey: 'requestId' })
+      this.hasMany(Approval, { sourceKey: 'requestId', foreignKey: 'requestId' })
       this.hasOne(Attachment, { sourceKey: 'uuid', foreignKey: 'parentId' })
       this.hasOne(Delegate, { sourceKey: 'requestId', foreignKey: 'requestId' })
     }
@@ -63,6 +64,15 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     status: {
       type: DataTypes.ENUM(...Object.values(StatusEnum)),
       defaultValue: StatusEnum.Pending
+    },
+    requiresAP: {
+      type: dataTypes.NUMBER,
+      allowNull: false,
+      defaultValue: 0,
+      get() {
+        const value = this.getDataValue('requiresAP')
+        return !!value
+      }
     },
     order: {
       type: DataTypes.VIRTUAL,

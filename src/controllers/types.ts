@@ -2,12 +2,15 @@
 import { Model } from "sequelize"
 import { ApprovalInterface, AttachmentInterface, CodingInterface, DelegateInterface, OPIQInterface, PurchaseInterface, ReconciliationInterface, RequestInterface, StatusEnum } from "@models/types"
 
+export interface CreateApprovalRequest {
+  requestId: string
+  approverEmail: string
+  isFinal: boolean | null
+}
+
 export interface UpdateApprovalRequest {
-  primaryApproval: boolean | null
-  primaryApprovalEmail: string | null
-  secondaryApproval: boolean | null
-  secondaryApprovalEmail: string | null
-  requiresAP: boolean
+  approval: boolean | null
+  isFinal: boolean | null
 }
 
 export interface UpdateApprovalResponse extends ControllerResponse {

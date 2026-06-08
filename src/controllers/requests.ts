@@ -3,16 +3,12 @@ import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Request, Approval, Purchase, Attachment, Reconciliation, OPIQ, Coding, Closed, Delegate } from '@models/index'
 import getFiscalYear from '@utils/getFiscalYear'
-import { bindServiceAcct } from '@utils/ldap'
 import setRequestStatus from '@utils/status/setRequestStatus'
-import { adminSearch } from '@utils/ldap/ldapLookups'
-import { sendPendingApprovalEmail } from '@utils/emails/automatedEmails'
 import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
 import { Model } from 'sequelize'
-import { Client } from 'ldapjs'
 import { RequestInterface } from '@models/types'
 import { GetRequestsResponse, GetRequestResponse, CreateRequestRequest, CreateRequestResponse, ControllerResponse } from './types'
 
@@ -122,45 +118,11 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
     return next(new ErrorResponse("Unable to create new request", 500))
   }
 
-  const { requestId } = request
-
-  const approval = await Approval.create({
-    requestId,
-    createdBy: email,
-    updatedBy: email
-  })
-
-  if(!approval) {
-    return next(new ErrorResponse(`Unable to create approval entry for requestId ${ requestId }`, 500))
-  }
-
   res.status(201).json({
     success: true,
     msg: 'Request Created',
     data: request
   })
-
-  if(process.env.NODE_ENV === 'production') {
-    setImmediate(async () => {
-      try {
-        const client = await bindServiceAcct() as Client
-
-        if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'POLICE') { // Fire / PD
-          try {
-            const admins = await adminSearch(department, client) as string[]
-
-            if(admins) {
-              sendPendingApprovalEmail(admins, request)
-            }
-          } catch (error) {
-            console.error(`Error sending pending approval email for ${department}:`, error)
-          }
-        }
-      } catch (error) {
-        console.error('Error in automated email process:', error)
-      }
-    })
-  }
 })
 
 //@desc    Update Request

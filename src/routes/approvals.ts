@@ -1,10 +1,14 @@
 import { Router } from 'express'
-import { updateApproval } from '@controllers/approvals'
+import { createApproval, updateApproval } from '@controllers/approvals'
 import { entra } from '@middleware/auth'
 
 const router = Router()
 
 router.use(entra)
+
+router
+  .route('/')
+  .post(createApproval)
 
 router
   .route('/:uuid')

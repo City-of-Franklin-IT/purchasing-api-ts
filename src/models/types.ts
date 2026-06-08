@@ -3,14 +3,12 @@ import { Optional, Sequelize, VirtualDataType, Model, ModelStatic } from "sequel
 
 export interface ApprovalInterface extends BaseInterface {
   requestId: string
-  primaryApproval: boolean | null
-  primaryApprovalEmail: string | null
-  secondaryApproval: boolean | null
-  secondaryApprovalEmail: string | null
-  requiresAP: boolean
+  approverEmail: string
+  approval: boolean | null
+  isFinal: boolean | null
 }
 
-export interface ApprovalCreationAttributes extends Optional<ApprovalInterface, 'requiresAP' | 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
+export interface ApprovalCreationAttributes extends Optional<ApprovalInterface, 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
 
 export interface AttachmentInterface extends BaseInterface {
   parentId: string
@@ -84,14 +82,15 @@ export interface RequestInterface extends BaseInterface {
   requestAmount: number
   weblink: string | null
   status: StatusEnum
+  requiresAP: boolean
   order: VirtualDataType<any>
-  Approval?: ApprovalInterface
+  Approvals?: ApprovalInterface[]
   Purchase?: PurchaseInterface
   Attachment?: AttachmentInterface
   Delegate?: DelegateInterface
 }
 
-export interface RequestCreationAttributes extends Optional<RequestInterface, 'requestId' | 'status' | 'order' | 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
+export interface RequestCreationAttributes extends Optional<RequestInterface, 'requestId' | 'status' | 'requiresAP' | 'order' | 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
 
 export interface FileInterface extends File { // For attachments
   mimetype: string

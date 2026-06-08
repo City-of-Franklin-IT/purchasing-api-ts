@@ -8,11 +8,9 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
   class Approval extends Model<ApprovalInterface, ApprovalCreationAttributes> {
     declare requestId: string
-    declare primaryApproval: boolean | null
-    declare primaryApprovalEmail: string | null
-    declare secondaryApproval: boolean | null
-    declare secondaryApprovalEmail: string | null
-    declare requiresAP: boolean
+    declare approverEmail: string
+    declare approval: boolean | null
+    declare isFinal: boolean | null
     declare uuid: string
     declare createdBy: string
     declare createdAt: Date
@@ -33,33 +31,22 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
       type: dataTypes.STRING,
       allowNull: false
     },
-    primaryApproval: {
-      type: dataTypes.NUMBER,
-      get() {
-        const value = this.getDataValue('primaryApproval')
-        return value === null ? null : !!value
-      }
-    },
-    primaryApprovalEmail: {
+    approverEmail: {
       type: dataTypes.STRING,
+      allowNull: false
     },
-    secondaryApproval: {
+    approval: {
       type: dataTypes.NUMBER,
       get() {
-        const value = this.getDataValue('secondaryApproval')
+        const value = this.getDataValue('approval')
         return value === null ? null : !!value
       }
     },
-    secondaryApprovalEmail: {
-      type: dataTypes.STRING
-    },
-    requiresAP: {
+    isFinal: {
       type: dataTypes.NUMBER,
-      allowNull: false,
-      defaultValue: 0,
       get() {
-        const value = this.getDataValue('requiresAP')
-        return !!value
+        const value = this.getDataValue('isFinal')
+        return value === null ? null : !!value
       }
     },
     uuid: {

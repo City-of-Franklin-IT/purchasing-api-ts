@@ -45,50 +45,50 @@ export default async (uuid: string, next: NextFunction): Promise<Model<RequestIn
 }
 
 const determineRequestStatus = (request: Model<RequestInterface> & RequestInterface): StatusEnum => {
-  const { Approval, Purchase } = request
+  const { Approvals, Purchase, requiresAP } = request
 
   if(Purchase) { // Handle requests with associated purchases
     if(Purchase.Closed) {
       return StatusEnum.Closed
     }
 
-    if(Purchase.Reconciliation?.reconciled) { 
+    if(Purchase.Reconciliation?.reconciled) {
       return StatusEnum.Completed
     }
 
     return StatusEnum.Purchased
-  } else return handleRequestApprovalStatus(Approval as ApprovalInterface)
+  } else return handleRequestApprovalStatus(Approvals as ApprovalInterface[], requiresAP)
 }
 
-const handleRequestApprovalStatus = (Approval: ApprovalInterface) => {
-  if(Approval?.primaryApproval === false) { // Denied
-    return StatusEnum.Denied // Return Denied
+const handleRequestApprovalStatus = (approvals: ApprovalInterface[] | undefined, requiresAP: boolean): StatusEnum => {
+  if (!approvals || approvals.length === 0) {
+    return StatusEnum.Pending
   }
 
-  let approvalStatus: StatusEnum = StatusEnum.Pending
-  
-  if(Approval?.primaryApproval) {
-    if(Approval?.secondaryApprovalEmail) { // Requires secondary approval
-      const secondaryApproval = Approval.secondaryApproval
+  if (approvals.some(a => a.approval === false)) {
+    return StatusEnum.Denied
+  }
 
-      switch(secondaryApproval) {
-        case true:
-          approvalStatus = StatusEnum.Approved
-          break
-        case false:
-          approvalStatus = StatusEnum.Denied
-          break
-        default:
-          approvalStatus = StatusEnum.PendingSecondaryApproval
-          break
-      }
-    } else approvalStatus = StatusEnum.Approved
+  const isFinalApprover = approvals.find(a => a.isFinal)
+  const allApproved = approvals.every(a => a.approval === true)
 
-    if(approvalStatus === StatusEnum.Approved) {
-      if(Approval.requiresAP) {
-        approvalStatus = StatusEnum.ApprovedForAP
-        return approvalStatus // Return Approved for AP
-      } else return approvalStatus // Return Approved
-    } else return approvalStatus // Return Denied | Pending Secondary Approval
-  } else return approvalStatus // Return Pending
+  if (allApproved && !isFinalApprover) {
+    return requiresAP ? StatusEnum.ApprovedForAP : StatusEnum.Approved
+  }
+
+  if (isFinalApprover) {
+    if (isFinalApprover.approval === false) {
+      return StatusEnum.Denied
+    }
+    if (isFinalApprover.approval === true) {
+      return requiresAP ? StatusEnum.ApprovedForAP : StatusEnum.Approved
+    }
+    return approvals.some(a => a.approval === true) ? StatusEnum.PendingSecondaryApproval : StatusEnum.Pending
+  }
+
+  if (approvals.some(a => a.approval === true)) {
+    return StatusEnum.Pending
+  }
+
+  return StatusEnum.Pending
 }

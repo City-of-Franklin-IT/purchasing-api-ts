@@ -12,7 +12,7 @@ import { AttachmentInterface, FileInterface } from '@models/types'
 import { ControllerResponse, CreateAttachmentRequest, GetAttachmentResponse } from './types'
 
 //@desc    Get attachment
-//@route   GET /api/v2/dept-purchasing/attachments/attachment/:uuid
+//@route   GET /api/v3/dept-purchasing/attachments/:uuid
 //@access  Private
 export const getAttachment = asyncHandler(async (req: Req<{ uuid: string }>, res: Response<GetAttachmentResponse>, next: NextFunction) => {
   const attachment = await Attachment.findOne({
@@ -25,10 +25,15 @@ export const getAttachment = asyncHandler(async (req: Req<{ uuid: string }>, res
     return next(new ErrorResponse(`Unable to download attachment by uuid ${ req.params.uuid }`, 500))
   }
 
+  const fileType = determineFileType(attachment.data as unknown as Buffer)
+
   res.status(200).json({
     success: true,
     msg: 'Attachment Downloaded',
-    data: attachment
+    data: {
+      attachment,
+      type: fileType.mimeType
+    }
   })
 })
 
@@ -36,32 +41,25 @@ export const getAttachment = asyncHandler(async (req: Req<{ uuid: string }>, res
 //@route   POST /api/v2/dept-purchasing/attachments
 //@access  Private
 export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttachmentRequest>, res: Response<ControllerResponse|{ success: boolean, msg: string }>, next: NextFunction) => {
-  try {
-    const { file } = req
-    const { parentId } = req.body
+  const { file } = req
+  const { parentId } = req.body
 
-    const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
+  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
 
-    const fileType = determineFileType(file?.buffer)
+  const fileType = determineFileType(file?.buffer)
 
-    if(!fileType) {
-      return next(new ErrorResponse("Unable to upload file - wrong file type", 500))
-    }
-
-    if(fileType.type === 'image') { 
-      await processImage(file as unknown as FileInterface, parentId, email, next) // Image
-    } else await processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
-
-    res.status(201).json({
-      success: true,
-      msg: 'File uploaded'
-    })
-  } catch(err) {
-    res.status(500).json({
-      success: false,
-      msg: 'Attachment Failed'
-    })
+  if(!fileType) {
+    return next(new ErrorResponse("Unable to upload file - wrong file type", 500))
   }
+
+  if(fileType.type === 'image') {
+    await processImage(file as unknown as FileInterface, parentId, email, next) // Image
+  } else await processPDF(file as unknown as FileInterface, parentId, email, next) // PDF
+
+  res.status(201).json({
+    success: true,
+    msg: 'File uploaded'
+  })
 })
 
 //@desc    Delete attachment

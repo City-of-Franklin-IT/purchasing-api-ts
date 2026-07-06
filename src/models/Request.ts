@@ -37,7 +37,8 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
   Request.init({
     requestId: {
       type: DataTypes.STRING,
-      allowNull: false 
+      allowNull: false,
+      primaryKey: true
     },
     department: {
       type: DataTypes.STRING,
@@ -67,12 +68,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     },
     requiresAP: {
       type: dataTypes.NUMBER,
-      allowNull: false,
-      defaultValue: 0,
-      get() {
-        const value = this.getDataValue('requiresAP')
-        return !!value
-      }
+      allowNull: true
     },
     order: {
       type: DataTypes.VIRTUAL,
@@ -122,8 +118,9 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     }
   },{
     sequelize,
-    tableName: 'requests',
-    modelName: 'Request'
+    tableName: 'request',
+    modelName: 'Request',
+    freezeTableName: true
   })
 
   return Request

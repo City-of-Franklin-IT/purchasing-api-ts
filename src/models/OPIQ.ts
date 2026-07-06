@@ -57,7 +57,8 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
   },{
     sequelize,
     tableName: 'opiq',
-    modelName: 'OPIQ'
+    modelName: 'OPIQ',
+    freezeTableName: true
   })
 
   return OPIQ

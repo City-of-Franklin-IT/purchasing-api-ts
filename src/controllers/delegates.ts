@@ -1,7 +1,7 @@
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
 import { Delegate, Request } from '@models/index'
-import { sendStatusEmail } from '@utils/emails/automatedEmails'
+import { triggerPowerAutomate } from '@utils/emails/powerAutomate'
 import editorTracking from '@utils/editorTracking'
 
 // Types
@@ -69,13 +69,7 @@ export const updateDelegate = asyncHandler(async (req: Req<{ uuid: string }, {},
     data
   })
 
-  setImmediate(() => {
-    try {
-      sendStatusEmail(request)
-    } catch (error) {
-      console.error('Error sending status email:', error)
-    }
-  })
+  setImmediate(() => triggerPowerAutomate('status_change', request.requestId))
 })
 
 //@desc    Delete Delegate

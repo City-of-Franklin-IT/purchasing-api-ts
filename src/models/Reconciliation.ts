@@ -8,7 +8,6 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
   class Reconciliation extends Model<ReconciliationInterface, ReconciliationCreationAttributes> {
     declare parentId: string
-    declare reconciled: boolean
     declare uuid: string
     declare createdBy: string
     declare createdAt: Date
@@ -28,15 +27,6 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     parentId: {
       type: DataTypes.UUID,
       allowNull: false
-    },
-    reconciled: {
-      type: DataTypes.NUMBER,
-      allowNull: false,
-      defaultValue: 0,
-      get() {
-        const value = this.getDataValue('reconciled')
-        return !!value
-      }
     },
     uuid: {
       type: dataTypes.UUID,
@@ -62,7 +52,8 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
   },{
     sequelize,
     tableName: 'reconciliation',
-    modelName: 'Reconciliation'
+    modelName: 'Reconciliation',
+    freezeTableName: true
   })
 
   return Reconciliation

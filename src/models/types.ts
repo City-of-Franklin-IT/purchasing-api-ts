@@ -12,7 +12,6 @@ export interface ApprovalCreationAttributes extends Optional<ApprovalInterface, 
 
 export interface AttachmentInterface extends BaseInterface {
   parentId: string
-  fileType: FileTypeEnum
   data: Blob
 }
 
@@ -68,10 +67,9 @@ export interface PurchaseCreationAttributes extends Optional<PurchaseInterface, 
 
 export interface ReconciliationInterface extends BaseInterface {
   parentId: string
-  reconciled: boolean
 }
 
-export interface ReconciliationCreationAttributes extends Optional<ReconciliationInterface, 'reconciled' |'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
+export interface ReconciliationCreationAttributes extends Optional<ReconciliationInterface, 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
 
 export interface RequestInterface extends BaseInterface {
   requestId: string
@@ -95,11 +93,6 @@ export interface RequestCreationAttributes extends Optional<RequestInterface, 'r
 export interface FileInterface extends File { // For attachments
   mimetype: string
   buffer: Buffer
-}
-
-export enum FileTypeEnum {
-  pdf = 'pdf',
-  jpeg = 'jpeg'
 }
 
 export enum StatusEnum {

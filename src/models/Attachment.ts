@@ -2,13 +2,12 @@
 
 // Types
 import { Sequelize, Model, ModelStatic, DataTypes } from "sequelize"
-import { AttachmentInterface, AttachmentCreationAttributes, RequestInterface, FileTypeEnum, PurchaseInterface } from './types'
+import { AttachmentInterface, AttachmentCreationAttributes, RequestInterface, PurchaseInterface } from './types'
 
 export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
   class Attachment extends Model<AttachmentInterface, AttachmentCreationAttributes> {
     declare parentId: string
-    declare fileType: "pdf" | "jpeg"
     declare data: Blob
     declare uuid: string
     declare createdBy: string
@@ -29,10 +28,6 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
   Attachment.init({
     parentId: {
       type: dataTypes.UUID,
-      allowNull: false
-    },
-    fileType: {
-      type: dataTypes.ENUM(...Object.values(FileTypeEnum)),
       allowNull: false
     },
     data: {
@@ -62,8 +57,9 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     }
   }, {
       sequelize,
-      tableName: 'attachments',
-      modelName: 'Attachment'
+      tableName: 'attachment',
+      modelName: 'Attachment',
+      freezeTableName: true
     })
 
     return Attachment

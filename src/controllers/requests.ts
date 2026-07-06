@@ -34,7 +34,7 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
       { model: Purchase,
         include: [
           { model: Attachment,
-            attributes: ['fileType', 'uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
+            attributes: ['uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
           },
           { model: Reconciliation },
           { model: OPIQ },
@@ -44,7 +44,7 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
       },
       { model: Approval },
       { model: Attachment,
-        attributes: ['fileType', 'uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
+        attributes: ['uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
       },
       { model: Delegate }
     ]
@@ -69,7 +69,7 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
       { model: Purchase,
         include: [
           { model: Attachment,
-            attributes: ['fileType', 'uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
+            attributes: ['uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
           },
           { model: Reconciliation },
           { model: OPIQ },
@@ -79,7 +79,7 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
       },
       { model: Approval },
       { model: Attachment,
-        attributes: ['fileType', 'uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
+        attributes: ['uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
       },
       { model: Delegate }
     ]
@@ -101,7 +101,9 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
 export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestRequest>, res: Response<CreateRequestResponse>, next: NextFunction) => {
   const { department, requestLocation, requestDetails, vendor, requestAmount, weblink } = req.body
 
-  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
+  const email = process.env.NODE_ENV === 'development' ? 
+    'test.o365-3@franklintn.gov' : 
+    req.entra?.preferred_username
 
   const request = await Request.create({
     requestId: `REQ${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }`,
@@ -129,7 +131,7 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
 //@route   PUT /api/v2/dept-purchasing/requests/:uuid
 //@access  Private
 export const updateRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: Response<ControllerResponse>, next: NextFunction) => {
-  const { requestLocation, requestDetails, vendor, requestAmount, weblink } = req.body
+  const { requestLocation, requestDetails, vendor, requestAmount, weblink, requiresAP } = req.body
 
   const request = await Request.update({
     requestLocation,
@@ -137,6 +139,7 @@ export const updateRequest = asyncHandler(async (req: Req<{ uuid: string }>, res
     vendor,
     requestAmount,
     weblink,
+    requiresAP,
     ...editorTracking(req)
   },{
     where: {

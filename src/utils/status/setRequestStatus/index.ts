@@ -52,7 +52,7 @@ const determineRequestStatus = (request: Model<RequestInterface> & RequestInterf
       return StatusEnum.Closed
     }
 
-    if(Purchase.Reconciliation?.reconciled) {
+    if(Purchase.Reconciliation) {
       return StatusEnum.Completed
     }
 

@@ -5,7 +5,7 @@ import { Attachment } from '@models/index'
 // Types
 import { NextFunction } from 'express'
 import { Metadata } from 'sharp'
-import { FileInterface, FileTypeEnum } from '@models/types'
+import { FileInterface } from '@models/types'
 
 export default async (file: FileInterface, parentId: string, email: string | undefined, next: NextFunction): Promise<void> => { // Handle image upload
   const metadata = await sharp(file.buffer).metadata()
@@ -28,7 +28,6 @@ export default async (file: FileInterface, parentId: string, email: string | und
 
       const image = await Attachment.create({
         parentId,
-        fileType: FileTypeEnum.jpeg,
         data: buffer as unknown as Blob,
         createdBy: email,
         updatedBy: email

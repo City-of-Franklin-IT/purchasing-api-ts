@@ -46,7 +46,7 @@ const determinePurchaseStatus = (purchase: Model<PurchaseInterface> & PurchaseIn
     return StatusEnum.Closed
   }
 
-  if(Reconciliation?.reconciled) { // Completed
+  if(Reconciliation) { // Completed
     return StatusEnum.Completed
   }
 

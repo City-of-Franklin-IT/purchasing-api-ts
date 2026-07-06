@@ -80,28 +80,28 @@ export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {},
 
   const data = (affectedRows as (Model<ApprovalInterface> & ApprovalInterface)[])[0]
 
-  const request = await Request.findOne({
-    where: {
-      requestId: data.requestId
-    }
-  }) as Model<RequestInterface> & RequestInterface
-
-  const updatedRequest = await setRequestStatus(request.uuid, next)
-
-  if(!updatedRequest) {
-    return next (new ErrorResponse(`Unable to update request status by request uuid ${ request.uuid }`, 500))
-  }
-
   res.status(200).json({
     success: true,
     msg: 'Approval Updated',
     data
   })
 
-  setImmediate(() => {
-    if(updatedRequest.status === 'Pending Secondary Approval') {
-      triggerPowerAutomate('pending_approval', updatedRequest.requestId)
+  if(approval && isFinal) {
+    const request = await Request.findOne({
+      where: {
+        requestId: data.requestId
+      }
+    }) as Model<RequestInterface> & RequestInterface
+
+    const updatedRequest = await setRequestStatus(request.uuid, next)
+
+    if(updatedRequest) {
+      setImmediate(() => {
+        if(updatedRequest.status === 'Pending Secondary Approval') {
+          triggerPowerAutomate('pending_approval', updatedRequest.requestId)
+        }
+        triggerPowerAutomate('status_change', updatedRequest.requestId)
+      })
     }
-    triggerPowerAutomate('status_change', updatedRequest.requestId)
-  })
+  }
 })

@@ -6,6 +6,10 @@ import { ValidationError } from 'sequelize'
 import { ErrorWithStatus, SequelizeErrorWithStatus } from './types'
 
 export default (err: ErrorWithStatus | SequelizeErrorWithStatus, req: Request, res: Response, next: NextFunction) => {
+  console.error('[ERROR_HANDLER]', JSON.stringify(err, null, 2))
+  if ((err as any).errors) {
+    console.error('[ERROR_DETAILS]', (err as any).errors)
+  }
   let error = { ...err }
 
   if(err.name === 'SequelizeValidationError') {

@@ -63,7 +63,8 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
   },{
     sequelize,
     tableName: 'closed',
-    modelName: 'Closed'
+    modelName: 'Closed',
+    freezeTableName: true
   })
 
   return Closed

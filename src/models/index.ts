@@ -39,7 +39,7 @@ const db = {
 
 const dbPath: DBPathInterface = cfg[env]
 
-db.sequelize = new Sequelize({ host: dbPath.host, database: dbPath.database, username: dbPath.username, password: dbPath.password, dialect: 'mssql', timezone: '+00:00', logging: false })
+db.sequelize = new Sequelize({ host: dbPath.host, database: dbPath.database, username: dbPath.username, password: dbPath.password, dialect: 'mssql', timezone: '+00:00', logging: console.log })
 
 DataTypes.DATE.prototype._stringify = function _stringify(date: Date) { // Format DATE for MSSQL
   if(!date) return date

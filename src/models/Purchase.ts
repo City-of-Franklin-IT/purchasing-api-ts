@@ -103,8 +103,9 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     }
   },{
     sequelize,
-    tableName: 'purchases',
-    modelName: 'Purchase'
+    tableName: 'purchase',
+    modelName: 'Purchase',
+    freezeTableName: true
   })
 
   return Purchase

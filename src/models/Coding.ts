@@ -57,7 +57,8 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
   },{
     sequelize,
     tableName: 'coding',
-    modelName: 'Coding'
+    modelName: 'Coding',
+    freezeTableName: true
   })
 
   return Coding

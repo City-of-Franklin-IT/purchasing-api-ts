@@ -4,15 +4,12 @@ import { ErrorResponse } from '@utils/errorResponse'
 import { Purchase, Request, Reconciliation, Attachment, OPIQ, Coding, Closed } from '@models/index'
 import getFiscalYear from '@utils/getFiscalYear'
 import setPurchaseStatus from '@utils/status/setPurchaseStatus'
-import { bindServiceAcct } from '@utils/ldap'
-import { adminSearch, parksLookup } from '@utils/ldap/ldapLookups'
-import { sendPurchaseEmail } from '@utils/emails/automatedEmails'
+import { triggerPowerAutomate } from '@utils/emails/powerAutomate'
 import editorTracking from '@utils/editorTracking'
 
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
 import { Model } from 'sequelize'
-import { Client } from 'ldapjs'
 import { PurchaseInterface, RequestInterface, StatusEnum } from '@models/types'
 import { GetPurchasesResponse, GetPurchaseResponse, CreatePurchaseRequest, CreatePurchaseResponse, UpdatePurchaseRequest, UpdatePurchaseResponse, ControllerResponse } from './types'
 import setRequestStatus from '@utils/status/setRequestStatus'
@@ -47,7 +44,7 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
     },
     include: [
       { model: Attachment,
-        attributes: ['fileType', 'uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
+        attributes: ['uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
       },
       { model: Reconciliation },
       { model: OPIQ },
@@ -72,7 +69,7 @@ export const getPurchase = asyncHandler(async (req: Req<{ uuid: string }>, res: 
     },
     include: [
       { model: Attachment,
-        attributes: ['fileType', 'uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
+        attributes: ['uuid', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt']
       },
       { model: Reconciliation },
       { model: OPIQ },
@@ -138,42 +135,14 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     emailBody = updatedRequest
   } else emailBody = purchase
 
-  const reconciliation = await Reconciliation.create({ // Create reconciliation entry
-    parentId: purchase.uuid,
-    createdBy: email,
-    updatedBy: email
-  })
-
-  if(!reconciliation) {
-    return next(new ErrorResponse("Could not create reconciliation entry for new purchase", 500))
-  }
-
   res.status(201).json({
     success: true,
     msg: 'Purchase Created',
     data: purchase
   })
 
-  if(process.env.NODE_ENV === 'production') { // Automated emails
-    setImmediate(async () => {
-      const client = await bindServiceAcct() as Client
-
-      if(department.toUpperCase() === 'FIRE' || department.toUpperCase() === 'POLICE') { // Fire / PD
-        const admins = await adminSearch(department, client) as string[]
-
-        if(admins) {
-          sendPurchaseEmail(admins, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-        }
-      }
-
-      if(department.toUpperCase() === 'PARKS') { // Parks
-        const emails = await parksLookup(email as string, client)
-
-        if(emails) {
-          sendPurchaseEmail(emails, emailBody as Model<PurchaseInterface> & PurchaseInterface)
-        }
-      }
-    })
+  if (!purchase.requestId) {
+    setImmediate(() => triggerPowerAutomate('purchase_submission', purchase.purchaseId!))
   }
 })
 

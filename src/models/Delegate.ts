@@ -55,8 +55,9 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     }
   },{
     sequelize,
-    tableName: 'delegates',
-    modelName: 'Delegate'
+    tableName: 'delegate',
+    modelName: 'Delegate',
+    freezeTableName: true
   })
 
   return Delegate

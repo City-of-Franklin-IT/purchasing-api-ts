@@ -18,7 +18,10 @@ export interface UpdateApprovalResponse extends ControllerResponse {
 }
 
 export interface GetAttachmentResponse extends ControllerResponse {
-  data: Model<AttachmentInterface> & AttachmentInterface
+  data: {
+    attachment: (Model<AttachmentInterface> & AttachmentInterface)
+    type: string
+  }
 }
 
 export interface CreateAttachmentRequest {
@@ -125,11 +128,11 @@ export interface UpdatePurchaseResponse extends ControllerResponse {
   data: Model<PurchaseInterface> & PurchaseInterface
 }
 
-export interface UpdateReconciliationRequest {
-  reconciled: boolean
+export interface CreateReconciliationRequest {
+  parentId: string
 }
 
-export interface UpdateReconciliationResponse extends ControllerResponse {
+export interface CreateReconciliationResponse extends ControllerResponse {
   data: Model<ReconciliationInterface> & ReconciliationInterface
 }
 

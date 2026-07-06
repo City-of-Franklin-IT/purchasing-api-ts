@@ -72,8 +72,9 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     }
   },{
     sequelize,
-    tableName: 'approvals',
+    tableName: 'approval',
     modelName: 'Approval',
+    freezeTableName: true
   })
 
   return Approval

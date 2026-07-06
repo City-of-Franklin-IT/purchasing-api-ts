@@ -16,7 +16,7 @@ app.use(helmet())
 app.use(hpp())
 app.use(csp) // Content security policy
 app.use(inputSanitation) // Input sanitation
-app.use(cors({ origin: ['https://dev.franklintn.gov', 'https://apps.franklintn.gov', 'http://cofasv38'] })) // CORS
+app.use(cors({ origin: ['https://dev.franklintn.gov', 'https://apps.franklintn.gov', 'https://istest.franklintn.gov'] })) // CORS
 
 import routes from './routes'
 

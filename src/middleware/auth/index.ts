@@ -1,7 +1,7 @@
 import asyncHandler from '../async'
 import { ErrorResponse } from '../../utils/errorResponse'
-import jwt from 'jsonwebtoken'
 import jwksClient from 'jwks-rsa'
+import jwt from 'jsonwebtoken'
 
 // Types
 import { Request, Response, NextFunction } from 'express'
@@ -34,11 +34,9 @@ const getKey = (header: any, callback: any) => {
 }
 
 export const entra = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
-  console.log('[AUTH] Middleware called, NODE_ENV:', process.env.NODE_ENV)
   const env = process.env.NODE_ENV
 
   if(env === 'development') {
-    console.log('[AUTH] Development mode - bypassing token validation')
     const today = new Date()
 
     const user: UserInterface = {
@@ -54,23 +52,23 @@ export const entra = asyncHandler(async (req: Request, _res: Response, next: Nex
     return next()
   }
 
-  if(!req.headers.authorization) {
+  if(!req.headers.authorization?.startsWith('Bearer ')) {
     return next(new ErrorResponse('Authorization header required', 401))
   }
 
-  const headers = new Headers()
+  const token = req.headers.authorization.slice('Bearer '.length)
 
-  headers.append('Authorization', req.headers.authorization)
+  jwt.verify(token, getKey, {
+    audience: process.env.ENTRA_CLIENT_ID,
+    issuer: `https://login.microsoftonline.com/${ process.env.ENTRA_TENANT_ID }/v2.0`
+  }, (err, decoded) => {
+    if(err) {
+      console.error('[AUTH] token verification error:', err.message)
+      return next(new ErrorResponse('Not authorized to access this route', 401))
+    }
 
-  const result = await fetch(`${ process.env.ENTRA_URL }`, { headers })
+    req.entra = decoded as EntraUserInterface
 
-  if(result.status !== 200) {
-    return next(new ErrorResponse('Not authorized to access this route', 401))
-  }
-
-  const data = await result.json()
-
-  req.entra = data.data
-
-  return next()
+    return next()
+  })
 })

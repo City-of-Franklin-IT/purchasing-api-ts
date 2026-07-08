@@ -13,7 +13,7 @@ export default (err: ErrorWithStatus | SequelizeErrorWithStatus, req: Request, r
     error.message = validationError.errors[0].message
     error = new ErrorResponse(error.message, 500)
   } else {
-    error = new ErrorResponse(err.message, 500)
+    error = new ErrorResponse(err.message, err.statusCode || 500)
   }
 
   res.status(error.statusCode || 500).json({

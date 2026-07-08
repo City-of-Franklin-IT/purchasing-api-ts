@@ -24,18 +24,23 @@ export const entra = asyncHandler(async (req: Request, res: Response, next: Next
     return next()
   }
 
-  if(req.headers.authorization) {
-    const headers = new Headers()
-    headers.append('Authorization', req.headers.authorization)
-    const result = await fetch(`${ process.env.ENTRA_URL }`, { headers })
+  if(!req.headers.authorization) {
+    return next(new ErrorResponse('Authorization header required', 401))
+  }
 
-    if(result.status !== 200) {
-      return next(new ErrorResponse('Not authorized to access this route', 401))
-    }
-    
-    const data = await result.json()
-    req.entra = data.data
+  const headers = new Headers()
 
-    return next()
-  } else return next(new ErrorResponse('Not authorized to access this route', 401))
+  headers.append('Authorization', req.headers.authorization)
+
+  const result = await fetch(`${ process.env.ENTRA_URL }`, { headers })
+
+  if(result.status !== 200) {
+    return next(new ErrorResponse('Not authorized to access this route', 401))
+  }
+
+  const data = await result.json()
+
+  req.entra = data.data
+
+  return next()
 })

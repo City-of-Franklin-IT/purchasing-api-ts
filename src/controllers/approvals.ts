@@ -51,7 +51,7 @@ export const createApproval = asyncHandler(async (req: Req<{}, {}, CreateApprova
   })
 
   setImmediate(() => {
-    triggerPowerAutomate('status_change', updatedRequest.requestId)
+    triggerPowerAutomate('pending_approval', updatedRequest.requestId)
   })
 })
 
@@ -86,22 +86,24 @@ export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {},
     data
   })
 
-  if(approval && isFinal) {
-    const request = await Request.findOne({
-      where: {
-        requestId: data.requestId
-      }
-    }) as Model<RequestInterface> & RequestInterface
-
-    const updatedRequest = await setRequestStatus(request.uuid, next)
-
-    if(updatedRequest) {
-      setImmediate(() => {
-        if(updatedRequest.status === 'Pending Secondary Approval') {
-          triggerPowerAutomate('pending_approval', updatedRequest.requestId)
-        }
-        triggerPowerAutomate('status_change', updatedRequest.requestId)
-      })
+  const request = await Request.findOne({
+    where: {
+      requestId: data.requestId
     }
+  }) as Model<RequestInterface> & RequestInterface
+
+  const previousStatus = request.status
+
+  const updatedRequest = await setRequestStatus(request.uuid, next)
+
+  if(updatedRequest) {
+    setImmediate(() => {
+      if(updatedRequest.status === 'Pending Secondary Approval') {
+        triggerPowerAutomate('pending_approval', updatedRequest.requestId)
+      }
+      if(updatedRequest.status !== previousStatus) {
+        triggerPowerAutomate('status_change', updatedRequest.requestId)
+      }
+    })
   }
 })

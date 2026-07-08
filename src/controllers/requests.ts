@@ -101,10 +101,6 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
 export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestRequest>, res: Response<CreateRequestResponse>, next: NextFunction) => {
   const { department, requestLocation, requestDetails, vendor, requestAmount, weblink } = req.body
 
-  const email = process.env.NODE_ENV === 'development' ? 
-    'test.o365-3@franklintn.gov' : 
-    req.entra?.preferred_username
-
   const request = await Request.create({
     requestId: `REQ${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }`,
     department: department.toUpperCase(),

@@ -55,33 +55,22 @@ export const entra = asyncHandler(async (req: Request, _res: Response, next: Nex
   }
 
   if(!req.headers.authorization) {
-    console.log('[AUTH] No authorization header')
+    return next(new ErrorResponse('Authorization header required', 401))
+  }
+
+  const headers = new Headers()
+
+  headers.append('Authorization', req.headers.authorization)
+
+  const result = await fetch(`${ process.env.ENTRA_URL }`, { headers })
+
+  if(result.status !== 200) {
     return next(new ErrorResponse('Not authorized to access this route', 401))
   }
 
-  const token = req.headers.authorization.replace('Bearer ', '')
-  console.log('[AUTH] Token extracted, length:', token.length)
+  const data = await result.json()
 
-  const expectedAudience = process.env.ENTRA_CLIENT_ID
-  
-  console.log('[AUTH] Validating with aud:', expectedAudience, 'tenant:', process.env.ENTRA_TENANT_ID)
+  req.entra = data.data
 
-  jwt.verify(token, getKey, {
-    algorithms: ['RS256'],
-    audience: expectedAudience,
-    issuer: [
-      `https://login.microsoftonline.com/${ process.env.ENTRA_TENANT_ID }/v2.0`,
-      `https://sts.windows.net/${ process.env.ENTRA_TENANT_ID }/`
-    ]
-  }, (err, decoded) => {
-    if (err) {
-      console.error('[AUTH] JWT verification failed:', err.message)
-      return next(new ErrorResponse('Not authorized to access this route', 401))
-    }
-
-    console.log('[AUTH] Token validated successfully, user:', (decoded as any)?.preferred_username)
-    req.entra = decoded as EntraUserInterface
-
-    return next()
-  })
+  return next()
 })

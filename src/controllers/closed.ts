@@ -23,15 +23,15 @@ export const createClosed = asyncHandler(async (req: Req<{}, {}, CreateClosedReq
     ...editorTracking(req)
   }) as Model<ClosedInterface> & ClosedInterface
 
-  if(!result) {
-    return next(new ErrorResponse('Unable to create new closed purchase entry', 500))
-  }
-
   const purchase = await Purchase.findOne({
     where: {
       uuid: parentId
     }
-  }) as Model<PurchaseInterface> & PurchaseInterface
+  }) as Model<PurchaseInterface> & PurchaseInterface | null
+
+  if(!purchase) {
+    return next(new ErrorResponse(`Unable to return purchase by uuid ${ parentId }`, 404))
+  }
 
   if(purchase.requestId) { // If purchase has associated request - update status of request
     const request = await Request.findOne({
@@ -67,7 +67,7 @@ export const updateClosed = asyncHandler(async (req: Req<{ uuid: string }, {}, U
   const [affectedCount] = result
 
   if(affectedCount === 0) {
-    return next(new ErrorResponse(`Unable to update closed entry with uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to update closed entry by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({
@@ -84,10 +84,10 @@ export const deleteClosed = asyncHandler(async (req: Req<{ uuid: string }>, res:
     where: {
       uuid: req.params.uuid
     }
-  }) as Model<ClosedInterface> & ClosedInterface
+  }) as Model<ClosedInterface> & ClosedInterface | null
 
   if(!closed) {
-    return next(new ErrorResponse(`Unable to return closed entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to return closed entry by uuid ${ req.params.uuid }`, 404))
   }
 
   const result = await Closed.destroy({ // Delete closed entry
@@ -97,21 +97,29 @@ export const deleteClosed = asyncHandler(async (req: Req<{ uuid: string }>, res:
   })
 
   if(result === 0) {
-    return next(new ErrorResponse(`Unable to delete closed entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to delete closed entry by uuid ${ req.params.uuid }`, 404))
   }
 
   const purchase = await Purchase.findOne({ // Associated purchase
     where: {
       uuid: closed.parentId
     }
-  }) as Model<PurchaseInterface> & PurchaseInterface
+  }) as Model<PurchaseInterface> & PurchaseInterface | null
+
+  if(!purchase) {
+    return next(new ErrorResponse(`Unable to return purchase by uuid ${ closed.parentId }`, 404))
+  }
 
   if(purchase.requestId) { // If purchase has associated request - update status of request
     const request = await Request.findOne({
       where: {
         requestId: purchase.requestId
       }
-    }) as Model<RequestInterface> & RequestInterface
+    }) as Model<RequestInterface> & RequestInterface | null
+
+    if(!request) {
+      return next(new ErrorResponse(`Unable to return request by requestId ${ purchase.requestId }`, 404))
+    }
 
     await setRequestStatus(request.uuid, next) // Update request status
   } else await setPurchaseStatus(purchase.uuid, next) // Update purchase status

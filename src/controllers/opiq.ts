@@ -12,7 +12,7 @@ import { ControllerResponse, CreateOPIQRequest, CreateOPIQResponse, UpdateOPIQRe
 //@desc    Create OPIQ entry
 //@route   POST /api/v2/dept-purchasing/opiq
 //@access  Private
-export const createOPIQ = asyncHandler(async (req: Req<{}, {}, CreateOPIQRequest>, res: Response<CreateOPIQResponse>, next: NextFunction) => {
+export const createOPIQ = asyncHandler(async (req: Req<{}, {}, CreateOPIQRequest>, res: Response<CreateOPIQResponse>) => {
   const { parentId, opiqNum } = req.body
 
   const opiq = await OPIQ.create({
@@ -20,10 +20,6 @@ export const createOPIQ = asyncHandler(async (req: Req<{}, {}, CreateOPIQRequest
     opiqNum,
     ...editorTracking(req)
   }) as Model<OPIQInterface> & OPIQInterface
-
-  if(!opiq) {
-    return next(new ErrorResponse('Unable to create new OPIQ entry', 500))
-  }
 
   res.status(201).json({
     success: true,
@@ -51,7 +47,7 @@ export const updateOPIQ = asyncHandler(async (req: Req<{ uuid: string }, {}, Upd
   const [affectedCount, affectedRows] = opiq
 
   if(affectedCount === 0) {
-    return next(new ErrorResponse(`Unable to update OPIQ entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to update OPIQ entry by uuid ${ req.params.uuid }`, 404))
   }
 
   const data = (affectedRows as (Model<OPIQInterface> & OPIQInterface)[])[0]
@@ -74,7 +70,7 @@ export const deleteOPIQ = asyncHandler(async (req: Req<{ uuid: string }>, res: R
   })
 
   if(result === 0) {
-    return next(new ErrorResponse(`Unable to delete OPIQ entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to delete OPIQ entry by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({

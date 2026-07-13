@@ -26,10 +26,10 @@ export const createReconciliation = asyncHandler(async (req: Req<{}, {}, CreateR
     where: {
       uuid: data.parentId
     }
-  }) as Model<PurchaseInterface> & PurchaseInterface
+  }) as Model<PurchaseInterface> & PurchaseInterface | null
 
   if(!purchase) {
-    return next(new ErrorResponse(`Unable to find purchase by uuid ${ data.parentId }`, 500))
+    return next(new ErrorResponse(`Unable to find purchase by uuid ${ data.parentId }`, 404))
   }
 
   if(purchase.requestId) { // If associated to a request
@@ -37,10 +37,10 @@ export const createReconciliation = asyncHandler(async (req: Req<{}, {}, CreateR
       where: {
         requestId: purchase.requestId
       }
-    }) as Model<RequestInterface> & RequestInterface
+    }) as Model<RequestInterface> & RequestInterface | null
 
     if(!request) {
-      return next (new ErrorResponse(`Unable to find request by requestId ${ purchase.requestId }`, 500))
+      return next (new ErrorResponse(`Unable to find request by requestId ${ purchase.requestId }`, 404))
     }
 
     await setRequestStatus(request.uuid, next) // Update request status

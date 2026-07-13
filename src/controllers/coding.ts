@@ -12,7 +12,7 @@ import { ControllerResponse, CreateCodingRequest, CreateCodingResponse, UpdateCo
 //@desc    Create Coding entry
 //@route   POST /api/v2/dept-purchasing/coding
 //@access  Private
-export const createCode = asyncHandler(async (req: Req<{}, {}, CreateCodingRequest>, res: Response<CreateCodingResponse>, next: NextFunction) => {
+export const createCode = asyncHandler(async (req: Req<{}, {}, CreateCodingRequest>, res: Response<CreateCodingResponse>) => {
   const { parentId, code } = req.body
 
   const result = await Coding.create({
@@ -20,10 +20,6 @@ export const createCode = asyncHandler(async (req: Req<{}, {}, CreateCodingReque
     code,
     ...editorTracking(req)
   }) as Model<CodingInterface> & CodingInterface
-
-  if(!result) {
-    return next(new ErrorResponse('Unable to create new coding entry', 500))
-  }
 
   res.status(201).json({
     success: true,
@@ -51,7 +47,7 @@ export const updateCode = asyncHandler(async (req: Req<{ uuid: string }, {}, Upd
   const [affectedCount, affectedRows] = result
 
   if(affectedCount === 0) {
-    return next(new ErrorResponse(`Unable to update code entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to update code entry by uuid ${ req.params.uuid }`, 404))
   }
 
   const data = (affectedRows as (Model<CodingInterface> & CodingInterface)[])[0]
@@ -74,7 +70,7 @@ export const deleteCode = asyncHandler(async (req: Req<{ uuid: string }>, res: R
   })
 
   if(result === 0) {
-    return next(new ErrorResponse(`Unable to delete coding entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to delete coding entry by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({

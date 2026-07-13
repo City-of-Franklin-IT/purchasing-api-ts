@@ -16,19 +16,15 @@ const jwks = jwksClient({
 
 const getKey = (header: any, callback: any) => {
   try {
-    console.log('[AUTH] getKey called, kid:', header?.kid)
     jwks.getSigningKey(header.kid, (err, key) => {
       if (err) {
-        console.error('[AUTH] getSigningKey error:', err.message)
         callback(err)
       } else {
-        console.log('[AUTH] Signing key found')
         const signingKey = key?.getPublicKey()
         callback(null, signingKey)
       }
     })
   } catch (err) {
-    console.error('[AUTH] getKey exception:', err)
     callback(err)
   }
 }
@@ -63,7 +59,6 @@ export const entra = asyncHandler(async (req: Request, _res: Response, next: Nex
     issuer: `https://login.microsoftonline.com/${ process.env.ENTRA_TENANT_ID }/v2.0`
   }, (err, decoded) => {
     if(err) {
-      console.error('[AUTH] token verification error:', err.message)
       return next(new ErrorResponse('Not authorized to access this route', 401))
     }
 

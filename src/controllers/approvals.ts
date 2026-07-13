@@ -34,11 +34,7 @@ export const createApproval = asyncHandler(async (req: Req<{}, {}, CreateApprova
     ...editorTracking(req)
   }) as Model<ApprovalInterface> & ApprovalInterface
 
-  if (!approval) {
-    return next(new ErrorResponse(`Unable to create approval for requestId ${ requestId }`, 500))
-  }
-
-  const updatedRequest = await setRequestStatus((request as any).uuid, next)
+  const updatedRequest = await setRequestStatus(request.uuid, next)
 
   if (!updatedRequest) {
     return next(new ErrorResponse(`Unable to update request status by request uuid ${ request.uuid }`, 500))
@@ -47,7 +43,7 @@ export const createApproval = asyncHandler(async (req: Req<{}, {}, CreateApprova
   res.status(201).json({
     success: true,
     msg: 'Approval Created',
-    data: approval as Model<ApprovalInterface> & ApprovalInterface
+    data: approval
   })
 
   setImmediate(() => {
@@ -75,7 +71,7 @@ export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {},
   const [affectedCount, affectedRows] = approval_result
 
   if(affectedCount === 0) {
-    return next(new ErrorResponse(`Unable to update request approval by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to update request approval by uuid ${ req.params.uuid }`, 404))
   }
 
   const data = (affectedRows as (Model<ApprovalInterface> & ApprovalInterface)[])[0]

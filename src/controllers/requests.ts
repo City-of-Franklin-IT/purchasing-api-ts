@@ -15,7 +15,7 @@ import { GetRequestsResponse, GetRequestResponse, CreateRequestRequest, CreateRe
 // @desc    Get requests
 // @route   GET /api/v2/dept-purchasing/requests?department=
 // @access  Private
-export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetRequestsResponse>, next: NextFunction) => {
+export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetRequestsResponse>) => {
   const { department, year } = req.query
 
   const createdAtFilter = Number(year) !== 1 ? {
@@ -60,7 +60,6 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
 // @route   GET /api/v2/dept-purchasing/requests/request/:uuid
 // @access  Private
 export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: Response<GetRequestResponse>, next: NextFunction) => {
-
   const request = await Request.findOne({
     where: {
       uuid: req.params.uuid
@@ -83,10 +82,10 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
       },
       { model: Delegate }
     ]
-  }) as Model<RequestInterface> & RequestInterface
+  }) as Model<RequestInterface> & RequestInterface | null
 
   if(!request) {
-    return next(new ErrorResponse(`Unable to return request by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to return request by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({
@@ -98,7 +97,7 @@ export const getRequest = asyncHandler(async (req: Req<{ uuid: string }>, res: R
 // @desc    Create request
 // @route   POST /api/v2/dept-purchasing/requests
 // @access  Private
-export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestRequest>, res: Response<CreateRequestResponse>, next: NextFunction) => {
+export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestRequest>, res: Response<CreateRequestResponse>) => {
   const { department, requestLocation, requestDetails, vendor, requestAmount, weblink } = req.body
 
   const request = await Request.create({
@@ -111,10 +110,6 @@ export const createRequest = asyncHandler(async (req: Req<{}, {}, CreateRequestR
     weblink,
     ...editorTracking(req)
   }) as Model<RequestInterface> & RequestInterface
-
-  if(!request) {
-    return next(new ErrorResponse("Unable to create new request", 500))
-  }
 
   res.status(201).json({
     success: true,
@@ -146,7 +141,7 @@ export const updateRequest = asyncHandler(async (req: Req<{ uuid: string }>, res
   const [affectedCount] = request
 
   if(affectedCount === 0) {
-    return next(new ErrorResponse(`Unable to update request by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to update request by uuid ${ req.params.uuid }`, 404))
   }
 
   setRequestStatus(req.params.uuid, next)
@@ -168,7 +163,7 @@ export const deleteRequest = asyncHandler(async (req: Req<{ uuid: string }>, res
   })
 
   if(result === 0) {
-    return next(new ErrorResponse(`Unable to delete request by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to delete request by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({

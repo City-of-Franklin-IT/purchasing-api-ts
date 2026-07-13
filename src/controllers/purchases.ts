@@ -17,7 +17,7 @@ import setRequestStatus from '@utils/status/setRequestStatus'
 //@desc    Get purchases
 //@route   GET /api/v2/dept-purchasing/purchases?department=&year=&createdBy=
 //@access  Private
-export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string, createdBy?: string }>, res: Response<GetPurchasesResponse>, next: NextFunction) => {
+export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string, createdBy?: string }>, res: Response<GetPurchasesResponse>) => {
   const { department, year, createdBy } = req.query
 
   const createdAtFilter = Number(year) !== 1 ? {
@@ -79,7 +79,7 @@ export const getPurchase = asyncHandler(async (req: Req<{ uuid: string }>, res: 
   }) as Model<PurchaseInterface> & PurchaseInterface
 
   if(!purchase) {
-    return next(new ErrorResponse(`Unable to return purchase by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to return purchase by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({
@@ -94,8 +94,6 @@ export const getPurchase = asyncHandler(async (req: Req<{ uuid: string }>, res: 
 export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchaseRequest>, res: Response<CreatePurchaseResponse>, next: NextFunction) => {
   const { requestId, department, purchaseLocation, purchaseDetails, vendor, purchaseAmount, lastFour } = req.body
 
-  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
-
   const purchase = await Purchase.create({
     purchaseId: !requestId ? `PUR${ getFiscalYear() }${ department.toUpperCase() }-${ Math.floor(Date.now() / 1000) }` : null,
     requestId,
@@ -109,10 +107,6 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     ...editorTracking(req)
   }) as Model<PurchaseInterface> & PurchaseInterface
 
-  if(!purchase) {
-    return next(new ErrorResponse('Unable to create new purchase', 500))
-  }
-
   let emailBody
 
   if(requestId) { // If purchase has associated request - update status of request
@@ -120,16 +114,16 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
       where: {
         requestId
       }
-    }) as Model<RequestInterface> & RequestInterface
+    }) as Model<RequestInterface> & RequestInterface | null
 
     if(!request) {
-      return next(new ErrorResponse(`Unable to update status for requestId ${ requestId }`, 500))
+      return next(new ErrorResponse(`Unable to update status for requestId ${ requestId }`, 404))
     }
 
     const updatedRequest = await setRequestStatus(request.uuid, next)
 
     if(!updatedRequest) {
-      return next(new ErrorResponse(`Unable to update request status by request uuid ${ request.uuid }`, 500))
+      return next(new ErrorResponse(`Unable to update request status by request uuid ${ request.uuid }`, 404))
     }
 
     emailBody = updatedRequest
@@ -141,7 +135,7 @@ export const createPurchase = asyncHandler(async (req: Req<{}, {}, CreatePurchas
     data: purchase
   })
 
-  if (!purchase.requestId) {
+  if(!purchase.requestId) {
     setImmediate(() => triggerPowerAutomate('purchase_submission', purchase.purchaseId!))
   }
 })
@@ -169,7 +163,7 @@ export const updatePurchase = asyncHandler(async (req: Req<{ uuid: string }, {},
   const [affectedCount, affectedRows] = purchase
 
   if(affectedCount === 0) {
-    return next(new ErrorResponse(`Unable to update purchase by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to update purchase by uuid ${ req.params.uuid }`, 404))
   }
 
   const data = (affectedRows as (Model<PurchaseInterface> & PurchaseInterface)[])[0]
@@ -179,10 +173,10 @@ export const updatePurchase = asyncHandler(async (req: Req<{ uuid: string }, {},
       where: {
         requestId: data.requestId
       }
-    }) as Model<RequestInterface> & RequestInterface
+    }) as Model<RequestInterface> & RequestInterface | null
 
     if(!request) {
-      return next(new ErrorResponse(`Unable to update status for requestId ${ data.requestId }`, 500))
+      return next(new ErrorResponse(`Unable to update status for requestId ${ data.requestId }`, 404))
     }
 
     await setRequestStatus(request.uuid, next)
@@ -212,7 +206,7 @@ export const deletePurchase = asyncHandler(async (req: Req<{ uuid: string }>, re
   })
 
   if(result === 0) {
-    return next(new ErrorResponse(`Unable to delete purchase by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to delete purchase by uuid ${ req.params.uuid }`, 404))
   }
 
   if(purchase.requestId) { // Update associated request
@@ -220,10 +214,10 @@ export const deletePurchase = asyncHandler(async (req: Req<{ uuid: string }>, re
       where: {
         requestId: purchase.requestId
       }
-    }) as Model<RequestInterface> & RequestInterface
+    }) as Model<RequestInterface> & RequestInterface | null
 
     if(!request) {
-      return next(new ErrorResponse(`Unable to update status for requestId ${ purchase.requestId }`, 500))
+      return next(new ErrorResponse(`Unable to update status for requestId ${ purchase.requestId }`, 404))
     }
 
     await setRequestStatus(request.uuid, next)

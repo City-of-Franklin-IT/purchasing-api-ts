@@ -13,17 +13,13 @@ import { ControllerResponse, CreateDelegateRequest, CreateDelegateResponse, Upda
 //@desc    Create Delegate
 //@route   POST /api/v2/dept-purchasing/delegate/create
 //@access  Private
-export const createDelegate = asyncHandler(async (req: Req<{}, {}, CreateDelegateRequest>, res: Response<CreateDelegateResponse>, next: NextFunction) => {
+export const createDelegate = asyncHandler(async (req: Req<{}, {}, CreateDelegateRequest>, res: Response<CreateDelegateResponse>) => {
   const { requestId } = req.body
 
   const delegate = await Delegate.create({
     requestId,
     ...editorTracking(req)
   }) as Model<DelegateInterface> & DelegateInterface
-
-  if(!delegate) {
-    return next(new ErrorResponse(`Unable to create delegate entry for request ${ requestId }`, 500))
-  }
 
   res.status(201).json({
     success: true,
@@ -50,7 +46,7 @@ export const updateDelegate = asyncHandler(async (req: Req<{ uuid: string }, {},
   const [affectedCount, affectedRows] = delegate
 
   if(affectedCount === 0) {
-    return next(new ErrorResponse(`Unable to update delegate entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to update delegate entry by uuid ${ req.params.uuid }`, 404))
   }
 
   const data = (affectedRows as (Model<DelegateInterface> & DelegateInterface)[])[0]
@@ -62,7 +58,11 @@ export const updateDelegate = asyncHandler(async (req: Req<{ uuid: string }, {},
     include: {
       model: Delegate
     }
-  }) as Model<RequestInterface> & RequestInterface
+  }) as Model<RequestInterface> & RequestInterface | null
+
+  if(!request) {
+    return next(new ErrorResponse(`Unable to return request by requestId ${ data.requestId }`, 404))
+  }
 
   res.status(200).json({
     success: true,
@@ -83,7 +83,7 @@ export const deleteDelegate = asyncHandler(async (req: Req<{ uuid: string }>, re
   })
 
   if(result === 0) {
-    return next(new ErrorResponse(`Unable to delete delgate entry by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to delete delgate entry by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({

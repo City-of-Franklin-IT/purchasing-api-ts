@@ -44,7 +44,9 @@ export const createAttachment = asyncHandler(async (req: Req<{}, {}, CreateAttac
   const { file } = req
   const { parentId } = req.body
 
-  const email = process.env.NODE_ENV === 'development' ? 'test.o365-3@franklintn.gov' : req.entra?.preferred_username
+  const email = process.env.NODE_ENV === 'development' ? 
+    'test.o365-3@franklintn.gov' : 
+    req.entra?.preferred_username
 
   const fileType = determineFileType(file?.buffer)
 
@@ -73,7 +75,7 @@ export const deleteAttachment = asyncHandler(async (req: Req<{ uuid: string }>, 
   })
 
   if(result === 0) {
-    return next(new ErrorResponse(`Unable to delete attachment by uuid ${ req.params.uuid }`, 500))
+    return next(new ErrorResponse(`Unable to delete attachment by uuid ${ req.params.uuid }`, 404))
   }
 
   res.status(200).json({

@@ -1,8 +1,10 @@
+import logger from '@utils/logger'
+
 export const triggerPowerAutomate = async (emailType: 'pending_approval' | 'purchase_submission' | 'status_change', id: string): Promise<void> => {
   const webhookUrl = process.env.POWER_AUTOMATE_WEBHOOK_URL
-  
+
   if (!webhookUrl) {
-    console.error('POWER_AUTOMATE_WEBHOOK_URL is not set')
+    logger.error('POWER_AUTOMATE_WEBHOOK_URL is not set')
     return
   }
 
@@ -18,9 +20,9 @@ export const triggerPowerAutomate = async (emailType: 'pending_approval' | 'purc
       body: JSON.stringify(payload)
     })
     if (!response.ok) {
-      console.error(`Power Automate error (${emailType}):`, await response.text())
+      logger.error({ emailType, body: await response.text() }, 'Power Automate error')
     }
   } catch (error) {
-    console.error(`Failed to trigger Power Automate (${emailType}):`, error)
+    logger.error({ emailType, err: error }, 'Failed to trigger Power Automate')
   }
 }

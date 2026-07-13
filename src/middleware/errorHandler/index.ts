@@ -1,4 +1,5 @@
 import { ErrorResponse } from '../../utils/errorResponse'
+import logger from '../../utils/logger'
 
 // Types
 import { Response, Request, NextFunction } from 'express'
@@ -6,9 +7,9 @@ import { ValidationError } from 'sequelize'
 import { ErrorWithStatus, SequelizeErrorWithStatus } from './types'
 
 export default (err: ErrorWithStatus | SequelizeErrorWithStatus, req: Request, res: Response, next: NextFunction) => {
-  console.error('[ERROR_HANDLER]', JSON.stringify(err, null, 2))
+  logger.error({ err }, '[ERROR_HANDLER]')
   if ((err as any).errors) {
-    console.error('[ERROR_DETAILS]', (err as any).errors)
+    logger.error({ errors: (err as any).errors }, '[ERROR_DETAILS]')
   }
   let error = { ...err }
 

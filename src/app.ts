@@ -5,12 +5,15 @@ import express from 'express'
 import hpp from 'hpp'
 import helmet from 'helmet'
 import cors from 'cors'
+import pinoHttp from 'pino-http'
 import errorHandler from './middleware/errorHandler'
 import csp from './middleware/csp'
 import inputSanitation from './middleware/inputSanitation'
+import logger from './utils/logger'
 
 const app = express()
 
+app.use(pinoHttp({ logger }))
 app.use(express.json()) // Request body parser
 app.use(helmet())
 app.use(hpp())
@@ -32,5 +35,5 @@ const port = process.env.PORT
 app.set('port', port)
 
 app.listen({ port }, async () => {
-  console.log(`Server up on ${ process.env.HOST }:${ port } in ${ process.env.NODE_ENV } mode..`)
+  logger.info(`Server up on ${ process.env.HOST }:${ port } in ${ process.env.NODE_ENV } mode..`)
 })

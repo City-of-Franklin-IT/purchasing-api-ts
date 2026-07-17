@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { createApproval, updateApproval } from '@controllers/approvals'
 import { entra } from '@middleware/auth'
+import { requireWrite } from '@utils/requireRole'
 
 const router = Router()
 
@@ -8,10 +9,10 @@ router.use(entra)
 
 router
   .route('/')
-  .post(createApproval)
+  .post(requireWrite, createApproval)
 
 router
   .route('/:uuid')
-  .put(updateApproval)
+  .put(requireWrite, updateApproval)
 
 export default router

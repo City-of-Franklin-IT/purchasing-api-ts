@@ -3,6 +3,7 @@ import multer from "multer"
 import { ErrorResponse } from "@utils/errorResponse"
 import { createAttachment, getAttachment, deleteAttachment } from "@controllers/attachments"
 import { entra } from "@middleware/auth"
+import { requireWrite } from "@utils/requireRole"
 
 const router = Router()
 
@@ -19,7 +20,7 @@ const upload = multer({
 }).single('file')
 
 router
-  .post('/', (req, res, next) => {
+  .post('/', requireWrite, (req, res, next) => {
     upload(req, res, (err) => {
       if(err) {
         return next(new ErrorResponse('Attachment upload failed', 400))
@@ -31,6 +32,6 @@ router
 router
   .route('/:uuid')
   .get(getAttachment)
-  .delete(deleteAttachment)
+  .delete(requireWrite, deleteAttachment)
 
 export default router

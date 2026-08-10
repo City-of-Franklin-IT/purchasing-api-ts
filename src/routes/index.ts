@@ -3,6 +3,7 @@ import attachments from './attachments'
 import closed from './closed'
 import coding from './coding'
 import delegates from './delegates'
+import emergency from './emergency'
 import opiq from './opiq'
 import purchases from './purchases'
 import reconciliation from './reconciliation'
@@ -27,6 +28,7 @@ export default (app: Express) => {
   setURL('/closed', closed)
   setURL('/coding', coding)
   setURL('/delegates', delegates)
+  setURL('/emergency', emergency)
   setURL('/opiq', opiq)
   setURL('/purchases', purchases)
   setURL('/reconciliation', reconciliation)

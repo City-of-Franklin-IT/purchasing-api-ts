@@ -2,7 +2,7 @@
 
 // Types
 import { Sequelize, Model, ModelStatic, DataTypes } from "sequelize"
-import { PurchaseInterface, PurchaseCreationAttributes, AttachmentInterface, OPIQInterface, CodingInterface, ClosedInterface, ReconciliationInterface, StatusEnum } from './types'
+import { PurchaseInterface, PurchaseCreationAttributes, AttachmentInterface, OPIQInterface, CodingInterface, ClosedInterface, ReconciliationInterface, EmergencyPurchaseInterface, StatusEnum } from './types'
 
 export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
 
@@ -22,12 +22,13 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     declare updatedBy: string
     declare updatedAt: Date
 
-    static associate({ Attachment, Reconciliation, OPIQ, Coding, Closed }: { Attachment: ModelStatic<Model<AttachmentInterface>>, Reconciliation: ModelStatic<Model<ReconciliationInterface>>, OPIQ: ModelStatic<Model<OPIQInterface>>, Coding: ModelStatic<Model<CodingInterface>>, Closed: ModelStatic<Model<ClosedInterface>> }) {          
+    static associate({ Attachment, Reconciliation, OPIQ, Coding, Closed, EmergencyPurchase }: { Attachment: ModelStatic<Model<AttachmentInterface>>, Reconciliation: ModelStatic<Model<ReconciliationInterface>>, OPIQ: ModelStatic<Model<OPIQInterface>>, Coding: ModelStatic<Model<CodingInterface>>, Closed: ModelStatic<Model<ClosedInterface>>, EmergencyPurchase: ModelStatic<Model<EmergencyPurchaseInterface>> }) {
       this.hasOne(Attachment, { sourceKey: 'uuid', foreignKey: 'parentId' })
       this.hasOne(Reconciliation, { sourceKey: 'uuid', foreignKey: 'parentId' })
       this.hasOne(OPIQ, { sourceKey: 'uuid', foreignKey: 'parentId' })
       this.hasOne(Coding, { sourceKey: 'uuid', foreignKey: 'parentId' })
       this.hasOne(Closed, { sourceKey: 'uuid', foreignKey: 'parentId' })
+      this.hasOne(EmergencyPurchase, { sourceKey: 'uuid', foreignKey: 'parentId' })
     }
 
     toJSON() {

@@ -69,25 +69,10 @@ const handleRequestApprovalStatus = (approvals: ApprovalInterface[] | undefined,
     return StatusEnum.Denied
   }
 
-  const isFinalApprover = approvals.find(a => a.isFinal)
-  const allApproved = approvals.every(a => a.approval === true)
+  const finalApprover = approvals.find(a => a.isFinal)
 
-  if (allApproved && !isFinalApprover) {
+  if (finalApprover?.approval === true) {
     return requiresAP ? StatusEnum.ApprovedForAP : StatusEnum.Approved
-  }
-
-  if (isFinalApprover) {
-    if (isFinalApprover.approval === false) {
-      return StatusEnum.Denied
-    }
-    if (isFinalApprover.approval === true) {
-      return requiresAP ? StatusEnum.ApprovedForAP : StatusEnum.Approved
-    }
-    return approvals.some(a => a.approval === true) ? StatusEnum.PendingSecondaryApproval : StatusEnum.Pending
-  }
-
-  if (approvals.some(a => a.approval === true)) {
-    return StatusEnum.Pending
   }
 
   return StatusEnum.Pending

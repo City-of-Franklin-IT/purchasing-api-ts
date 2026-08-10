@@ -11,6 +11,7 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
     declare approverEmail: string
     declare approval: boolean | null
     declare isFinal: boolean | null
+    declare note: string | null
     declare uuid: string
     declare createdBy: string
     declare createdAt: Date
@@ -48,6 +49,9 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
         const value = this.getDataValue('isFinal')
         return value === null ? null : !!value
       }
+    },
+    note: {
+      type: dataTypes.TEXT
     },
     uuid: {
       type: dataTypes.UUID,

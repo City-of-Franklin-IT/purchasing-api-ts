@@ -11,12 +11,13 @@ import AttachmentModel from './Attachment'
 import ClosedModel from './Closed'
 import CodingModel from './Coding'
 import DelegateModel from './Delegate'
+import EmergencyPurchaseModel from './EmergencyPurchase'
 import OPIQModel from './OPIQ'
 import PurchaseModel from './Purchase'
 import ReconciliationModel from './Reconciliation'
 import RequestModel from './Request'
 import { ConfigInterface, DBPathInterface } from './types'
-import { ApprovalInterface, AttachmentInterface, ClosedInterface, CodingInterface, DelegateInterface, OPIQInterface, PurchaseInterface, ReconciliationInterface, RequestInterface, DatabaseInterface, ModelWithAssociate } from './types'
+import { ApprovalInterface, AttachmentInterface, ClosedInterface, CodingInterface, DelegateInterface, EmergencyPurchaseInterface, OPIQInterface, PurchaseInterface, ReconciliationInterface, RequestInterface, DatabaseInterface, ModelWithAssociate } from './types'
 
 const env = process.env.NODE_ENV || 'development'
 
@@ -31,6 +32,7 @@ const db = {
   Closed: {} as ModelStatic<Model<ClosedInterface>>,
   Coding: {} as ModelStatic<Model<CodingInterface>>,
   Delegate: {} as ModelStatic<Model<DelegateInterface>>,
+  EmergencyPurchase: {} as ModelStatic<Model<EmergencyPurchaseInterface>>,
   OPIQ: {} as ModelStatic<Model<OPIQInterface>>,
   Purchase: {} as ModelStatic<Model<PurchaseInterface>>,
   Reconciliation: {} as ModelStatic<Model<ReconciliationInterface>>,
@@ -54,6 +56,7 @@ db.Attachment = AttachmentModel(db.sequelize, DataTypes)
 db.Closed = ClosedModel(db.sequelize, DataTypes)
 db.Coding = CodingModel(db.sequelize, DataTypes)
 db.Delegate = DelegateModel(db.sequelize, DataTypes)
+db.EmergencyPurchase = EmergencyPurchaseModel(db.sequelize, DataTypes)
 db.OPIQ = OPIQModel(db.sequelize, DataTypes)
 db.Purchase = PurchaseModel(db.sequelize, DataTypes)
 db.Reconciliation = ReconciliationModel(db.sequelize, DataTypes)
@@ -70,6 +73,7 @@ export const Attachment = db.Attachment
 export const Closed = db.Closed
 export const Coding = db.Coding
 export const Delegate = db.Delegate
+export const EmergencyPurchase = db.EmergencyPurchase
 export const OPIQ = db.OPIQ
 export const Purchase = db.Purchase
 export const Reconciliation = db.Reconciliation

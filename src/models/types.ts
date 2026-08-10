@@ -6,6 +6,7 @@ export interface ApprovalInterface extends BaseInterface {
   approverEmail: string
   approval: boolean | null
   isFinal: boolean | null
+  note: string | null
 }
 
 export interface ApprovalCreationAttributes extends Optional<ApprovalInterface, 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
@@ -61,6 +62,7 @@ export interface PurchaseInterface extends BaseInterface {
   Coding?: CodingInterface
   Reconciliation?: ReconciliationInterface
   Closed?: ClosedInterface
+  EmergencyPurchase?: EmergencyPurchaseInterface
 }
 
 export interface PurchaseCreationAttributes extends Optional<PurchaseInterface, 'purchaseId' | 'requestId' | 'order' | 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
@@ -90,6 +92,13 @@ export interface RequestInterface extends BaseInterface {
 
 export interface RequestCreationAttributes extends Optional<RequestInterface, 'requestId' | 'status' | 'requiresAP' | 'order' | 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
 
+export interface EmergencyPurchaseInterface extends BaseInterface {
+  parentId: string
+  comments: string
+}
+
+export interface EmergencyPurchaseCreationAttributes extends Optional<EmergencyPurchaseInterface, 'uuid' | 'createdBy' | 'createdAt' | 'updatedBy' | 'updatedAt'>{}
+
 export interface FileInterface extends File { // For attachments
   mimetype: string
   buffer: Buffer
@@ -98,7 +107,6 @@ export interface FileInterface extends File { // For attachments
 export enum StatusEnum {
   Purchased = 'Purchased',
   Pending = 'Pending',
-  PendingSecondaryApproval = 'Pending Secondary Approval',
   Approved = 'Approved',
   ApprovedForAP = 'Approved For AP',
   Completed = 'Completed',
@@ -113,6 +121,7 @@ export interface DatabaseInterface {
   Closed: ModelStatic<Model<ClosedInterface, ClosedCreationAttributes>>
   Coding: ModelStatic<Model<CodingInterface, CodingCreationAtttributes>>
   Delegate: ModelStatic<Model<DelegateInterface, DelegateCreationAttributes>>
+  EmergencyPurchase: ModelStatic<Model<EmergencyPurchaseInterface, EmergencyPurchaseCreationAttributes>>
   OPIQ: ModelStatic<Model<OPIQInterface, OPIQCreationAttributes>>
   Purchase: ModelStatic<Model<PurchaseInterface, PurchaseCreationAttributes>>
   Reconciliation: ModelStatic<Model<ReconciliationInterface, ReconciliationCreationAttributes>>

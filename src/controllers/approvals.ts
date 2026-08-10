@@ -9,13 +9,13 @@ import editorTracking from '@utils/editorTracking'
 import { Request as Req, Response, NextFunction } from 'express'
 import { Model } from 'sequelize'
 import { CreateApprovalRequest, UpdateApprovalRequest, UpdateApprovalResponse } from './types'
-import { ApprovalInterface, RequestInterface } from '@models/types'
+import { ApprovalInterface, RequestInterface, StatusEnum } from '@models/types'
 
 //@desc    Create request approval
 //@route   POST /api/v2/dept-purchasing/approvals
 //@access  Private
 export const createApproval = asyncHandler(async (req: Req<{}, {}, CreateApprovalRequest>, res: Response<UpdateApprovalResponse>, next: NextFunction) => {
-  const { requestId, approverEmail, isFinal } = req.body
+  const { requestId, approverEmail, isFinal, note } = req.body
 
   const request = (await Request.findOne({
     where: {
@@ -31,6 +31,7 @@ export const createApproval = asyncHandler(async (req: Req<{}, {}, CreateApprova
     requestId,
     approverEmail,
     isFinal,
+    note,
     ...editorTracking(req)
   }) as Model<ApprovalInterface> & ApprovalInterface
 
@@ -55,11 +56,12 @@ export const createApproval = asyncHandler(async (req: Req<{}, {}, CreateApprova
 //@route   PUT /api/v2/dept-purchasing/approvals/:uuid
 //@access  Private
 export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateApprovalRequest>, res: Response<UpdateApprovalResponse>, next: NextFunction) => {
-  const { approval, isFinal } = req.body
+  const { approval, isFinal, note } = req.body
 
   const approval_result = await Approval.update({
     approval,
     isFinal,
+    note,
     ...editorTracking(req)
   },{
     where: {
@@ -94,10 +96,7 @@ export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {},
 
   if(updatedRequest) {
     setImmediate(() => {
-      if(updatedRequest.status === 'Pending Secondary Approval') {
-        triggerPowerAutomate('pending_approval', updatedRequest.requestId)
-      }
-      if(updatedRequest.status !== previousStatus) {
+      if(updatedRequest.status !== previousStatus && updatedRequest.status !== StatusEnum.Pending) {
         triggerPowerAutomate('status_change', updatedRequest.requestId)
       }
     })

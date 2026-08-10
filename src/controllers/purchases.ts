@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import asyncHandler from '@middleware/async'
 import { ErrorResponse } from '@utils/errorResponse'
-import { Purchase, Request, Reconciliation, Attachment, OPIQ, Coding, Closed } from '@models/index'
+import { Purchase, Request, Reconciliation, Attachment, OPIQ, Coding, Closed, EmergencyPurchase } from '@models/index'
 import getFiscalYear from '@utils/getFiscalYear'
 import setPurchaseStatus from '@utils/status/setPurchaseStatus'
 import { triggerPowerAutomate } from '@utils/emails/powerAutomate'
@@ -49,7 +49,8 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
       { model: Reconciliation },
       { model: OPIQ },
       { model: Coding },
-      { model: Closed }
+      { model: Closed },
+      { model: EmergencyPurchase }
     ]
   }) as (Model<PurchaseInterface> & PurchaseInterface)[]
 
@@ -74,7 +75,8 @@ export const getPurchase = asyncHandler(async (req: Req<{ uuid: string }>, res: 
       { model: Reconciliation },
       { model: OPIQ },
       { model: Coding },
-      { model: Closed }
+      { model: Closed },
+      { model: EmergencyPurchase }
     ]
   }) as Model<PurchaseInterface> & PurchaseInterface
 

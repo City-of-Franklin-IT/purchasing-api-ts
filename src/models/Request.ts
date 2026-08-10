@@ -78,18 +78,16 @@ export default (sequelize: Sequelize, dataTypes: typeof DataTypes) => {
             return 0
           case StatusEnum.Pending:
             return 1
-          case StatusEnum.PendingSecondaryApproval:
-            return 2
           case StatusEnum.Approved:
-            return 3
+            return 2
           case StatusEnum.ApprovedForAP:
+            return 3
+          case StatusEnum.Completed:
             return 4
-          case StatusEnum.Completed: 
-            return 5
           case StatusEnum.Closed:
-            return 6
+            return 5
           case StatusEnum.Denied:
-            return 7
+            return 6
           default:
             return null
         }

@@ -1,16 +1,18 @@
 // Types
 import { Model } from "sequelize"
-import { ApprovalInterface, AttachmentInterface, CodingInterface, DelegateInterface, OPIQInterface, PurchaseInterface, ReconciliationInterface, RequestInterface, StatusEnum } from "@models/types"
+import { ApprovalInterface, AttachmentInterface, CodingInterface, DelegateInterface, EmergencyPurchaseInterface, OPIQInterface, PurchaseInterface, ReconciliationInterface, RequestInterface, StatusEnum } from "@models/types"
 
 export interface CreateApprovalRequest {
   requestId: string
   approverEmail: string
   isFinal: boolean | null
+  note: string | null
 }
 
 export interface UpdateApprovalRequest {
   approval: boolean | null
   isFinal: boolean | null
+  note: string | null
 }
 
 export interface UpdateApprovalResponse extends ControllerResponse {
@@ -70,6 +72,23 @@ export interface UpdateDelegateRequest {
 export interface UpdateDelegateResponse {
   success: true
   data: Model<DelegateInterface> & DelegateInterface
+}
+
+export interface CreateEmergencyRequest {
+  parentId: string
+  comments: string
+}
+
+export interface CreateEmergencyResponse extends ControllerResponse {
+  data: Model<EmergencyPurchaseInterface> & EmergencyPurchaseInterface
+}
+
+export interface UpdateEmergencyRequest {
+  comments: string
+}
+
+export interface UpdateEmergencyResponse extends ControllerResponse {
+  data: Model<EmergencyPurchaseInterface> & EmergencyPurchaseInterface
 }
 
 export interface CreateOPIQRequest {

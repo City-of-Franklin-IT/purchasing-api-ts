@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "dev": "nodemon -r tsconfig-paths/register src/app.ts",
-    "deploy": "rsync -av --delete dist/ andrew@cofasv30:/opt/builds/test/dept-purchasing-api-ts/dist/ && rsync -av package.json package-lock.json andrew@cofasv30:/opt/builds/test/dept-purchasing-api-ts/ && ssh andrew@cofasv30 'pm2 restart purchasing-api-ts-test'",
+    "deploy": "rsync -av --delete dist/ andrew@cofasv30:/opt/builds/dept-purchasing-api-ts/dist/ && rsync -av package.json package-lock.json andrew@cofasv30:/opt/builds/dept-purchasing-api-ts/ && ssh andrew@cofasv30 'pm2 restart purchasing-api-ts'",
     "start": "npx tsx dist/app.js"
   },
   "author": "Andrew Southern",
@@ -39,8 +39,8 @@
     "multer": "^2.0.2",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
-    "sequelize": "^6.37.5",
-    "sharp": "^0.33.5",
+    "sequelize": "^6.37.8",
+    "sharp": "^0.35.3",
     "tedious": "^18.6.1"
   }
 }

@@ -10,6 +10,7 @@ export interface CreateApprovalRequest {
 }
 
 export interface UpdateApprovalRequest {
+  approverEmail: string
   approval: boolean | null
   isFinal: boolean | null
   note: string | null

@@ -56,9 +56,23 @@ export const createApproval = asyncHandler(async (req: Req<{}, {}, CreateApprova
 //@route   PUT /api/v2/dept-purchasing/approvals/:uuid
 //@access  Private
 export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {}, UpdateApprovalRequest>, res: Response<UpdateApprovalResponse>, next: NextFunction) => {
-  const { approval, isFinal, note } = req.body
+  const { approverEmail, approval, isFinal, note } = req.body
+
+  // Fetch old approval to track if approverEmail changed
+  const oldApproval = await Approval.findOne({
+    where: {
+      uuid: req.params.uuid
+    }
+  }) as Model<ApprovalInterface> & ApprovalInterface | null
+
+  if (!oldApproval) {
+    return next(new ErrorResponse(`Unable to find approval with uuid ${ req.params.uuid }`, 404))
+  }
+
+  const oldApproverEmail = oldApproval.approverEmail
 
   const approval_result = await Approval.update({
+    approverEmail,
     approval,
     isFinal,
     note,
@@ -96,6 +110,12 @@ export const updateApproval = asyncHandler(async (req: Req<{ uuid: string }, {},
 
   if(updatedRequest) {
     setImmediate(() => {
+      // Send pending_approval email if approverEmail has changed
+      if(oldApproverEmail !== approverEmail) {
+        triggerPowerAutomate('pending_approval', updatedRequest.requestId)
+      }
+
+      // Send status_change email if status changed
       if(updatedRequest.status !== previousStatus && updatedRequest.status !== StatusEnum.Pending) {
         triggerPowerAutomate('status_change', updatedRequest.requestId)
       }

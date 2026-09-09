@@ -15,10 +15,10 @@ import { GetPurchasesResponse, GetPurchaseResponse, CreatePurchaseRequest, Creat
 import setRequestStatus from '@utils/status/setRequestStatus'
 
 //@desc    Get purchases
-//@route   GET /api/v2/dept-purchasing/purchases?department=&year=&createdBy=
+//@route   GET /api/v2/dept-purchasing/purchases?department=&year=
 //@access  Private
-export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string, createdBy?: string }>, res: Response<GetPurchasesResponse>) => {
-  const { department, year, createdBy } = req.query
+export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { department: string, year: string }>, res: Response<GetPurchasesResponse>) => {
+  const { department, year } = req.query
 
   const createdAtFilter = Number(year) !== 1 ? {
     createdAt: {
@@ -27,20 +27,11 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
     }
   } : undefined
 
-  const setCreatedByFilter = (createdBy: string | undefined) => {
-    if(!createdBy || req.entra?.roles.includes('task.admin')) return null
-
-    return { createdBy }
-  }
-
-  const createdByFilter = setCreatedByFilter(createdBy)
-
   const purchases = await Purchase.findAll({
     where: {
       department,
       requestId: null,
-      ...createdAtFilter,
-      ...createdByFilter
+      ...createdAtFilter
     },
     include: [
       { model: Attachment,
@@ -53,6 +44,16 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
       { model: EmergencyPurchase }
     ]
   }) as (Model<PurchaseInterface> & PurchaseInterface)[]
+
+  // Filter police purchases to only those created by the logged in user unless admin
+  if(department.toLowerCase() === "police" && !req.entra?.roles.some(role => ["task.admin", "task.sudo"].includes(role))) {
+    const filtered = purchases.filter(purchase => purchase.createdBy.toLowerCase() === req.entra?.preferred_username.toLowerCase())
+
+    return res.status(200).json({
+      success: true,
+      data: filtered
+    })
+  }
 
   res.status(200).json({
     success: true,

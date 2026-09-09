@@ -50,6 +50,16 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
     ]
   }) as (Model<RequestInterface> & RequestInterface)[]
 
+  // Filter police requests to only those created by the logged in user unless admin
+  if(department.toLowerCase() === "police" && !req.entra?.roles.some(role => ["task.admin", "task.sudo"].includes(role))) {
+    const filtered = requests.filter(request => request.createdBy.toLowerCase() === req.entra?.preferred_username.toLowerCase())
+
+      return res.status(200).json({
+        success: true,
+        data: filtered
+    })
+  }
+
   res.status(200).json({
     success: true,
     data: requests

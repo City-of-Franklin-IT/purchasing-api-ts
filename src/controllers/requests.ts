@@ -9,7 +9,7 @@ import editorTracking from '@utils/editorTracking'
 // Types
 import { Request as Req, Response, NextFunction } from 'express'
 import { Model } from 'sequelize'
-import { RequestInterface } from '@models/types'
+import { RequestInterface, StatusEnum } from '@models/types'
 import { GetRequestsResponse, GetRequestResponse, CreateRequestRequest, CreateRequestResponse, ControllerResponse } from './types'
 
 // @desc    Get requests
@@ -50,13 +50,18 @@ export const getRequests = asyncHandler(async (req: Req<{}, {}, {}, { department
     ]
   }) as (Model<RequestInterface> & RequestInterface)[]
 
-  // Filter police requests to only those created by the logged in user unless admin
-  if(department.toLowerCase() === "police" && !req.entra?.roles.some(role => ["task.admin", "task.sudo"].includes(role))) {
-    const filtered = requests.filter(request => request.createdBy.toLowerCase() === req.entra?.preferred_username.toLowerCase())
+  // Filter police requests to only those created by the logged in user, or pending the logged in user's approval, unless admin
+  if(department.toLowerCase() === "police" && !req.entra?.roles.some(role => ["task.admin", "task.sudo", "task.chief"].includes(role))) {
+    const preferredUsername = req.entra?.preferred_username.toLowerCase()
 
-      return res.status(200).json({
-        success: true,
-        data: filtered
+    const filtered = requests.filter(request =>
+      request.createdBy.toLowerCase() === preferredUsername ||
+      (request.status === StatusEnum.Pending && request.Approvals?.some(approval => approval.approverEmail.toLowerCase() === preferredUsername))
+    )
+
+    return res.status(200).json({
+      success: true,
+      data: filtered
     })
   }
 

@@ -46,7 +46,7 @@ export const getPurchases = asyncHandler(async (req: Req<{}, {}, {}, { departmen
   }) as (Model<PurchaseInterface> & PurchaseInterface)[]
 
   // Filter police purchases to only those created by the logged in user unless admin
-  if(department.toLowerCase() === "police" && !req.entra?.roles.some(role => ["task.admin", "task.sudo"].includes(role))) {
+  if(department.toLowerCase() === "police" && !req.entra?.roles.some(role => ["task.admin", "task.sudo", "task.chief"].includes(role))) {
     const filtered = purchases.filter(purchase => purchase.createdBy.toLowerCase() === req.entra?.preferred_username.toLowerCase())
 
     return res.status(200).json({

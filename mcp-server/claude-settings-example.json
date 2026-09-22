@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "purchasing-api": {
+      "command": "npx",
+      "args": ["tsx", "mcp-server/src/server.ts"],
+      "description": "MCP server for exploring the purchasing-api-ts codebase"
+    }
+  }
+}

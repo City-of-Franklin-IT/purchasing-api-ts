@@ -1,0 +1,23 @@
+{
+  "name": "purchasing-api-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for purchasing-api-ts codebase",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/server.ts",
+    "start": "node dist/server.js"
+  },
+  "keywords": ["mcp"],
+  "author": "Andrew Southern",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "tsx": "^4.19.0"
+  }
+}

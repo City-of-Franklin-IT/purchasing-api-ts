@@ -7,3 +7,5 @@ services:
     ports:
       - "127.0.0.1:6000:6000"
     user: "1001:1001"
+    volumes:
+      - /opt/docs:/opt/docs:ro

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "dev": "NODE_ENV=development nodemon -r tsconfig-paths/register src/app.ts",
-    "deploy": "rsync -av --delete dist/ andrew@cofasv30:/opt/builds/purchasing-api-ts/dist/ && rsync -av package.json package-lock.json .env .env.production andrew@cofasv30:/opt/builds/purchasing-api-ts/ && ssh andrew@cofasv30 'pm2 restart purchasing-api-ts'",
+    "deploy": "scp deploy/docker-compose.yml .env $USER@cofasv30:/opt/containers/purchasing-api-ts",
     "start": "npx tsx dist/app.js"
   },
   "author": "Andrew Southern",

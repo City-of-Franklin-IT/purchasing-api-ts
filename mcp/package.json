@@ -7,7 +7,7 @@
     "dev": "NODE_ENV=development nodemon --exec tsx app.ts",
     "start": "npx tsx dist/app.js --port 7005",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "rsync -av --delete dist/ andrew@cofasv30:/opt/builds/purchasing-api-ts/mcp/dist/ && rsync -av package.json package-lock.json .env andrew@cofasv30:/opt/builds/purchasing-api-ts/mcp/ && ssh andrew@cofasv30 'pm2 restart purchasing-mcp-ts'"
+    "deploy": "scp deploy/docker-compose.yml .env $USER@cofasv30:/opt/containers/mcp/purchasing"
   },
   "keywords": [],
   "author": "Andrew Southern",

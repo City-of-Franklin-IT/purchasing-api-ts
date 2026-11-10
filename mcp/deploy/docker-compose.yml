@@ -2,8 +2,17 @@ services:
   purchasing-mcp:
     image: ghcr.io/city-of-franklin-it/purchasing-mcp:1.0.0
     restart: unless-stopped
-    env_file:
-      - .env
+    environment:
+      - MCP_HOST=${MCP_HOST}
+      - MCP_PORT=${MCP_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_HOST=${DB_HOST}
+      - ENTRA_TENANT_ID=${ENTRA_TENANT_ID}
+      - ENTRA_CLIENT_ID=${ENTRA_CLIENT_ID}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
     ports:
-      - "127.0.0.1:7005:7005"
+      - "127.0.0.1:${MCP_PORT}:${MCP_PORT}"
     user: "1001:1001"

@@ -2,10 +2,20 @@ services:
   purchasing-api-ts:
     image: ghcr.io/city-of-franklin-it/purchasing-api-ts:1.0.0
     restart: unless-stopped
-    env_file:
-      - .env
+    environment:
+      - BASE_URL=${BASE_URL}
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_HOST=${DB_HOST}
+      - ENTRA_TENANT_ID=${ENTRA_TENANT_ID}
+      - ENTRA_CLIENT_ID=${ENTRA_CLIENT_ID}
+      - POWER_AUTOMATE_WEBHOOK_URL=${POWER_AUTOMATE_WEBHOOK_URL}
+      - LOG_LEVEL=${LOG_LEVEL}
     ports:
-      - "127.0.0.1:6000:6000"
+      - "127.0.0.1:${PORT}:${PORT}"
     user: "1001:1001"
     volumes:
       - /opt/docs:/opt/docs:ro

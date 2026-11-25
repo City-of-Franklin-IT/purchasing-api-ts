@@ -20,3 +20,22 @@ services:
     volumes:
       - /opt/docs:/opt/docs:ro
     container_name: purchasing-api
+
+  purchasing-mcp:
+    image: ghcr.io/city-of-franklin-it/purchasing-mcp:1.0.0
+    restart: unless-stopped
+    environment:
+      - MCP_HOST=${MCP_HOST}
+      - MCP_PORT=${MCP_PORT}
+      - DB_USERNAME=${MCP_DB_USERNAME}
+      - DB_PASSWORD=${MCP_DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_HOST=${DB_HOST}
+      - ENTRA_TENANT_ID=${ENTRA_TENANT_ID}
+      - ENTRA_CLIENT_ID=${MCP_ENTRA_CLIENT_ID}
+      - ANTHROPIC_API_KEY=${MCP_ANTHROPIC_API_KEY}
+      - ANTHROPIC_MODEL=${MCP_ANTHROPIC_MODEL}
+    ports:
+      - "127.0.0.1:${MCP_PORT}:${MCP_PORT}"
+    user: "1001:1001"
+    container_name: purchasing-mcp

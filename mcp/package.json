@@ -6,8 +6,7 @@
     "build": "tsc && tsc-alias",
     "dev": "NODE_ENV=development nodemon --exec tsx app.ts",
     "start": "npx tsx dist/app.js --port 7005",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "scp deploy/docker-compose.yml .env $USER@cofasv30:/opt/containers/mcp/purchasing"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Andrew Southern",

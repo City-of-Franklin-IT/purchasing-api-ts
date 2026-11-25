@@ -1,6 +1,6 @@
 services:
   purchasing-api-ts:
-    image: ghcr.io/city-of-franklin-it/purchasing-api-ts:1.0.0
+    image: ghcr.io/city-of-franklin-it/purchasing-api-ts:1.0.1
     restart: unless-stopped
     environment:
       - BASE_URL=${BASE_URL}
@@ -19,3 +19,4 @@ services:
     user: "1001:1001"
     volumes:
       - /opt/docs:/opt/docs:ro
+    container_name: purchasing-api
